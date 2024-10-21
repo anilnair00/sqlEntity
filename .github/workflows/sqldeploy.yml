@@ -62,7 +62,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Azure SQL deploy-database
-      uses: azure/sql-action@v1.3
+      uses: azure/sql-action@v2.3
       with:
         server-name: testsqlserver00
         connection-string: ${{ secrets.sqldbconnection}}
@@ -71,6 +71,7 @@ jobs:
         # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
         # dacpac-package: migration.sql
         # script-file: ${{ github.workspace }}/myapp/migration.sql
+        script-file: migration.sql
         
     # - name: Login to Azure Subscription 1
     #   uses: azure/login@v1
