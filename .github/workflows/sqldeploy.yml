@@ -61,13 +61,17 @@ jobs:
       with: 
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         
-    - name: Stop Azure Function App
-      uses: azure/functions-action@v1
-      # id: fa
-      with:
-        app-name: testfnc
-        action: stop
-        # resource-group-name: testfnc_group
+    - name: Publish Azure Function App
+      run: func azure functionapp stop testfnc
+      # working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}      
+      
+    # - name: Stop Azure Function App
+    #   uses: azure/functions-action@v1
+    #   # id: fa
+    #   with:
+    #     app-name: testfnc
+    #     action: stop
+    #     # resource-group-name: testfnc_group
 
     - name: Azure SQL deploy-database
       uses: azure/sql-action@v2.3
