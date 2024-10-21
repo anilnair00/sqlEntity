@@ -67,11 +67,12 @@ jobs:
         server-name: testsqlserver00
         connection-string: ${{ secrets.sqldbconnection}}
         db-name: testsql001
-        # path: '${{ github.workspace }}/myapp/migration.sql'
+        path: './migration.sql'
+        action: publish
         # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
         # dacpac-package: migration.sql
         # script-file: ${{ github.workspace }}/myapp/migration.sql
-        script-file: migration.sql
+        
         
     # - name: Login to Azure Subscription 1
     #   uses: azure/login@v1
@@ -111,16 +112,16 @@ jobs:
     #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
     #     # script-file: ${{ github.workspace }}/myapp/migration.sql
 
-    - name: Login to Azure Subscription 1
-      uses: azure/login@v1
-      with:
-       client-id: ${{ secrets.AZURE_CLIENT_ID }}
-       tenat-id: ${{ secrets.AZURE_TENANT_ID }}
-       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    # - name: Login to Azure Subscription 1
+    #   uses: azure/login@v1
+    #   with:
+    #    client-id: ${{ secrets.AZURE_CLIENT_ID }}
+    #    tenat-id: ${{ secrets.AZURE_TENANT_ID }}
+    #    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: Start Azure Function App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ secrets.FUNCTIONS_APP_NAME }}
-        slot-name: 'production'
-        action: 'start'
+    # - name: Start Azure Function App
+    #   uses: azure/webapps-deploy@v2
+    #   with:
+    #     app-name: ${{ secrets.FUNCTIONS_APP_NAME }}
+    #     slot-name: 'production'
+    #     action: 'start'
