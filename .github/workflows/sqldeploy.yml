@@ -35,7 +35,10 @@ jobs:
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
 
     - name: Create EF Core migration script ()
-      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project Web --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
+      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
+
+    # - name: Create EF Core migration script ()
+    #   run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project Web --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
@@ -53,44 +56,58 @@ jobs:
       uses: actions/download-artifact@v3.0.0
       with:
         name: SQL-DB
-
-    - name: Login to Azure Subscription 1
-      uses: azure/login@v1
-      with:
-       client-id: ${{ secrets.AZURE_CLIENT_ID }}
-       tenat-id: ${{ secrets.AZURE_TENANT_ID }}
-       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    - name: Stop Azure Function App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ secrets.FUNCTIONS_APP_NAME }}
-        action: 'stop'
-
-    - name: Login to Azure Subscription 2
-      uses: azure/login@v1
-      with:
-       client-id: ${{ secrets.AZURE_CLIENT_ID }}
-       tenat-id: ${{ secrets.AZURE_TENANT_ID }}
-       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    - name: Fetch Secrets from Azure key Vault
-      id: keyvault
-      uses: azure/get-keyvault-secrets@v1
-      with:
-        keyvault: ${{ secrets.KEYVAULT_NAME }}
-        secrets: |
-          db-connection-string
+        
+    - uses: azure/login@v1
+      with: 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Azure SQL deploy-database
       uses: azure/sql-action@v1.3
       with:
-        server-name: ${{ secrets.SQL_SERVER_NAME }}
-        connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
-        db-name: ${{ secrets.SQL_DB_NAME }}
+        server-name: testsqlserver00
+        connection-string: ${{ secrets.sqldbconnection}}
+        db-name: testsql001
         script-file: migration.sql
         # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
         # script-file: ${{ github.workspace }}/myapp/migration.sql
+        
+    # - name: Login to Azure Subscription 1
+    #   uses: azure/login@v1
+    #   with:
+    #    client-id: ${{ secrets.AZURE_CLIENT_ID }}
+    #    tenat-id: ${{ secrets.AZURE_TENANT_ID }}
+    #    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    # - name: Stop Azure Function App
+    #   uses: azure/webapps-deploy@v2
+    #   with:
+    #     app-name: ${{ secrets.FUNCTIONS_APP_NAME }}
+    #     action: 'stop'
+
+    # - name: Login to Azure Subscription 2
+    #   uses: azure/login@v1
+    #   with:
+    #    client-id: ${{ secrets.AZURE_CLIENT_ID }}
+    #    tenat-id: ${{ secrets.AZURE_TENANT_ID }}
+    #    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    # - name: Fetch Secrets from Azure key Vault
+    #   id: keyvault
+    #   uses: azure/get-keyvault-secrets@v1
+    #   with:
+    #     keyvault: ${{ secrets.KEYVAULT_NAME }}
+    #     secrets: |
+    #       db-connection-string
+
+    # - name: Azure SQL deploy-database
+    #   uses: azure/sql-action@v1.3
+    #   with:
+    #     server-name: ${{ secrets.SQL_SERVER_NAME }}
+    #     connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
+    #     db-name: ${{ secrets.SQL_DB_NAME }}
+    #     script-file: migration.sql
+    #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
+    #     # script-file: ${{ github.workspace }}/myapp/migration.sql
 
     - name: Login to Azure Subscription 1
       uses: azure/login@v1
