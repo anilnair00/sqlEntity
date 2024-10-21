@@ -67,7 +67,7 @@ jobs:
         server-name: testsqlserver00
         connection-string: ${{ secrets.sqldbconnection}}
         db-name: testsql001
-        path: '${{ github.workspace }}/myapp/migration.sql'
+        # path: '${{ github.workspace }}/myapp/migration.sql'
         # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
         # dacpac-package: migration.sql
         # script-file: ${{ github.workspace }}/myapp/migration.sql
