@@ -66,7 +66,7 @@ jobs:
       # id: fa
       with:
         app-name: testfnc
-        startup-command: stop
+        action: stop
         # resource-group-name: testfnc_group
 
     - name: Azure SQL deploy-database
