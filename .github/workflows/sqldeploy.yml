@@ -65,7 +65,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: testfnc
-        action: 'stop'        
+        startup-command: 'stop'        
 
     - name: Azure SQL deploy-database
       uses: azure/sql-action@v2.3
