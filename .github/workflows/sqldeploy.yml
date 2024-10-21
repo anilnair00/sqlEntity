@@ -60,16 +60,10 @@ jobs:
     - uses: azure/login@v1
       with: 
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-    - name: Publish Azure Function App
-      run: func azure functionapp stop testfnc
-      # working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}   
+
       
-    - name: Stop Azure App Service
-      uses: azure/webapps-deploy@v1
-      with:
-        app-name: testfnc
-        action: 'stop'      
+    - name: Stop Azure Function App
+      run: az functionapp stop --name testfnc --resource-group testfnc_group    
         
     # - name: Stop Azure Function App
     #   uses: azure/functions-action@v1
@@ -91,11 +85,8 @@ jobs:
         # dacpac-package: migration.sql
         # script-file: ${{ github.workspace }}/myapp/migration.sql
         
-    - name: Start Azure Function App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: testfnc
-        action: 'start'
+    - name: Stop Azure Function App
+      run: az functionapp start --name testfnc --resource-group testfnc_group   
     
     # - name: Login to Azure Subscription 1
     #   uses: azure/login@v1
