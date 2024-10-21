@@ -35,7 +35,7 @@ jobs:
       run: dotnet ef migrations script -context AppxDbContext -i /p:OutDir=${{ github.workspace }}/myapp/migration.sql
 
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3.0.0
       with:
         name: SQLDB
         path: ${{ github.workspace }}/myapp/migration.sql
@@ -47,7 +47,7 @@ jobs:
 
     steps:
     - name: Download Build Artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3.0.0
       with:
         name: SQL-DB
 
