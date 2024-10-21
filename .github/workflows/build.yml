@@ -1,0 +1,41 @@
+name: .NET Core CI with Unit Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release
+      - develop
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0'  # Adjust this to your .NET version
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # Run tests for each specified Xunit project
+    - name: Run Unit Test for AzAiIntegration.Test
+      run: dotnet test --no-restore --verbosity normal ./AzAiIntegration.Test/AzAiIntegration.Test.csproj
+
+    - name: Run Unit Test for AzAiIntegration.DataAccess.Test
+      run: dotnet test --no-restore --verbosity normal ./AzAiIntegration.DataAccess.Test/AzAiIntegration.DataAccess.Test.csproj
+
+    - name: Run Unit Test for Claim.Test
+      run: dotnet test --no-restore --verbosity normal ./Claim.Test/Claim.Test.csproj
+
+    - name: Run Unit Test for Claim.DataAccess.Test
+      run: dotnet test --no-restore --verbosity normal ./Claim.DataAccess.Test/Claim.DataAccess.Test.csproj
+
+    - name: Build
+      run: dotnet build --no-restore

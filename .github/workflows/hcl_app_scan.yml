@@ -1,0 +1,18 @@
+name: "HCL AppScan (SAST, IAST)"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 10 * * 1' # every Monday at 10:00AM
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run AppScan SAST scan
+        uses: HCL-TECH-SOFTWARE/appscan-sast-action@v1.0.4
+        with:
+          asoc_key: ${{ secrets.HCL_APP_SCAN_API_KEY_ID }}
+          asoc_secret: ${{ secrets.HCL_APP_SCAN_API_KEY_SECRET }}
+          application_id: ${{ vars.HCL_APP_SCAN_APP_ID }}
+          scan_name: AC-IT-Development_AirCanada.Appx.Integration

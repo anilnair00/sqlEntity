@@ -1,0 +1,5 @@
+﻿<Project>
+	<ItemGroup>
+		<PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" />
+	</ItemGroup>
+</Project>

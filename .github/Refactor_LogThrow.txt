@@ -1,0 +1,7 @@
+Replace & remove the existing LogError and throw statements (i.e.selected lines) by a single call to the LoggerExtensions type.
+Make sure to pass the exception object as a parameter.
+Add a using statement for the LoggerExtensions type outside of the namespace.
+
+
+
+

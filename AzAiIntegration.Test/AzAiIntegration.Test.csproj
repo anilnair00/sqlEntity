@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <AssemblyName>AirCanada.Appx.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>AirCanada.Appx.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <UserSecretsId>e2fd3be9-2fad-4503-9375-a3965e6b6293</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Csla" Version="8.2.7" />
+    <PackageReference Include="FluentAssertions" Version="6.12.1" />
+    <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.10" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AzAiIntegration.DataAccess\AzAiIntegration.DataAccess.csproj" />
+    <ProjectReference Include="..\AzAiIntegration.Functions\AzAiIntegration.Functions.csproj" />
+    <ProjectReference Include="..\AzAiIntegration\AzAiIntegration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
