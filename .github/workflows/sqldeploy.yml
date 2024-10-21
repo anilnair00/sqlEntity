@@ -43,7 +43,7 @@ jobs:
   deploySqlscriptsonDev:
     runs-on: ubuntu-latest
     needs: build
-    env: DEV
+    # environment: DEV
 
     steps:
     - name: Download Build Artifacts
