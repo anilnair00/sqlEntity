@@ -23,7 +23,7 @@ jobs:
         dotnet-version: '8.0'
 
     - name: Install Entity Framework CLI
-      run: dotnet tool restore
+      run: dotnet tool install --global dotnet-ef
 
     - name: Build .NET Projects
       run: dotnet build AzAiIntegration.IntegrationTest/AzAiIntegration.IntegrationTest.csproj --configuration $BUILD_CONFIG
