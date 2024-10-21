@@ -32,7 +32,7 @@ jobs:
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
 
     - name: Create EF Core migration script ()
-      run: dotnet ef migrations script -context AzAiIntegration.DataAccess/SQLTable/AppxDbContext -i /p:OutDir=${{ github.workspace }}/myapp/migration.sql
+      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --s Web -context AppxDbContext -i /p:OutDir=${{ github.workspace }}/myapp/migration.sql
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
