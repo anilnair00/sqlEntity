@@ -44,7 +44,6 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         name: SQLDB
-        path: ${{ github.workspace }}
 
   deploySqlscriptsonDev:
     runs-on: ubuntu-latest
