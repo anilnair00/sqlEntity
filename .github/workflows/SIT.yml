@@ -1,80 +1,43 @@
 name: SIT
 
 on:
-  pull_request:
+  push:
     branches:
       - develop
       - release
       - master
 
 env:
-  SIT_ENVIRONMENT: SIT
-  SIT_SERVICE_CONNECTION: ODE SSET DEV
-  SIT_WEBSITE_URL: https://stodessetsitacit.z9.web.core.windows.net/
-  SIT_FUNCTIONS_APP_NAME: acodesset-sit
-  SIT_STORAGE_NAME: stodessetsitacit
-  SIT_WEBSITE_STORAGE_SAS_TOKEN: ${{ secrets.WEBSITE_STORAGE_SAS_TOKEN_SIT }}
+  DEV_ENVIRONMENT: DEV
+  DEV_SERVICE_CONNECTION: ${{ secrets. AZURE_CREDENTIALS }}
+  DEV_FUNCTIONS_APP_NAME: devtestfnc
   UAT_ENVIRONMENT: UAT
-  UAT_SERVICE_CONNECTION: ODE SSET UAT
-  UAT_WEBSITE_URL: https://stodessetuatacit.z9.web.core.windows.net/
-  UAT_FUNCTIONS_APP_NAME: acodesset-uat
-  UAT_STORAGE_NAME: stodessetuatacit
-  UAT_WEBSITE_STORAGE_SAS_TOKEN: ${{ secrets.WEBSITE_STORAGE_SAS_TOKEN_UAT }}
+  UAT_SERVICE_CONNECTION: ${{ secrets. AZURE_CREDENTIALS }}
+  UAT_FUNCTIONS_APP_NAME: uattestfnc
+  PRD_SERVICE_CONNECTION: ${{ secrets. AZURE_CREDENTIALS }}
+  DEV_SQL_DB: devdbserver00
+  UAT_SQL_DB: uatdbserver00
+  PRD_SQL_DB: prddbserver00
   PRD_ENVIRONMENT: PRD
-  PRD_SERVICE_CONNECTION: ODE SSET PROD
-  PRD_WEBSITE_URL: https://stodessetprdacit.z9.web.core.windows.net/
-  PRD_FUNCTIONS_APP_NAME: acodesset-prd
-  PRD_STORAGE_NAME: stodessetprdacit
-  PRD_WEBSITE_STORAGE_SAS_TOKEN: ${{ secrets.WEBSITE_STORAGE_SAS_TOKEN_PRD }}
 
 jobs:
   deploy:
-    runs-on: windows-2019
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/release' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/uat'
     env:
-      environment: ${{ github.ref == 'refs/heads/release' && env.UAT_ENVIRONMENT || github.ref == 'refs/heads/master' && env.PRD_ENVIRONMENT || env.SIT_ENVIRONMENT }}
-      serviceConnection: ${{ github.ref == 'refs/heads/release' && env.UAT_SERVICE_CONNECTION || github.ref == 'refs/heads/master' && env.PRD_SERVICE_CONNECTION || env.SIT_SERVICE_CONNECTION }}
-      websiteUrl: ${{ github.ref == 'refs/heads/release' && env.UAT_WEBSITE_URL || github.ref == 'refs/heads/master' && env.PRD_WEBSITE_URL || env.SIT_WEBSITE_URL }}
-      functionsAppName: ${{ github.ref == 'refs/heads/release' && env.UAT_FUNCTIONS_APP_NAME || github.ref == 'refs/heads/master' && env.PRD_FUNCTIONS_APP_NAME || env.SIT_FUNCTIONS_APP_NAME }}
-      storageName: ${{ github.ref == 'refs/heads/release' && env.UAT_STORAGE_NAME || github.ref == 'refs/heads/master' && env.PRD_STORAGE_NAME || env.SIT_STORAGE_NAME }}
-      websiteStorageSasToken: ${{ github.ref == 'refs/heads/release' && env.UAT_WEBSITE_STORAGE_SAS_TOKEN || github.ref == 'refs/heads/master' && env.PRD_WEBSITE_STORAGE_SAS_TOKEN || env.SIT_WEBSITE_STORAGE_SAS_TOKEN }}
-
+      environment: ${{ github.ref == 'refs/heads/master' && env.DEV_ENVIRONMENT || github.ref == 'refs/heads/uat' && env.UAT_ENVIRONMENT || env.PRD_ENVIRONMENT }}
+      serviceConnection: ${{ github.ref == 'refs/heads/master' && env.DEV_SERVICE_CONNECTION || github.ref == 'refs/heads/uat' && env.UAT_SERVICE_CONNECTION || env.PRD_SERVICE_CONNECTION }}
+      functionsAppName: ${{ github.ref == 'refs/heads/master' && env.DEV_FUNCTIONS_APP_NAME || github.ref == 'refs/heads/uat' && env.UAT_FUNCTIONS_APP_NAME || env.PRD_FUNCTIONS_APP_NAME }}
+      dbServerName: ${{ github.ref == 'refs/heads/master' && env.DEV_SQL_DB || github.ref == 'refs/heads/uat' && env.UAT_SQL_DB || env.PRD_SQL_DB }}
+      
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Stop Functions
-      uses: azure/appservice-actions@v1
+    - name: Azure Login
+      uses: azure/login@v1
       with:
-        app-name: ${{ env.functionsAppName }}
-        action: 'stop'
-        azure-subscription: ${{ env.serviceConnection }}
-
-    - name: Deploy Functions
-      uses: azure/functions-action@v1
-      with:
-        app-name: ${{ env.functionsAppName }}
-        package: '$(Pipeline.Workspace)/SSET/Functions/Functions.zip'
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-
-    - name: Start Functions
-      uses: azure/appservice-actions@v1
-      with:
-        app-name: ${{ env.functionsAppName }}
-        action: 'start'
-        azure-subscription: ${{ env.serviceConnection }}
-
-    - name: Deploy Front End
-      run: |
-        choco install azcopy10
-        azcopy copy $(Pipeline.Workspace)\SSET\Front\*.js 'https://$(storageName).blob.core.windows.net/$web$(websiteStorageSasToken)' --content-type="application/javascript; charset=utf8"
-        azcopy sync $(Pipeline.Workspace)\SSET\Front 'https://$(storageName).blob.core.windows.net/$web$(websiteStorageSasToken)' --delete-destination=true
-
-    - name: Check Front End
-      run: |
-        $response = Invoke-WebRequest -Uri $(websiteUrl)index.html -Method Head
-        if ($response.StatusCode -ne 200) {
-          throw
-        }
-      shell: pwsh
-      continue-on-error: true
+        creds: ${{ secrets[env.serviceConnection] }}
+        
+    - name: Stop Azure Function App
+      run: az functionapp stop --name devtestfnc --resource-group testfnc_group    
