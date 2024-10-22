@@ -7,29 +7,18 @@ on:
       - release
       - master
 
-env:
-  DEV_ENVIRONMENT: DEV
-  DEV_SERVICE_CONNECTION: ${{ secrets. AZURE_CREDENTIALS }}
-  DEV_FUNCTIONS_APP_NAME: devtestfnc
-  UAT_ENVIRONMENT: UAT
-  UAT_SERVICE_CONNECTION: ${{ secrets. AZURE_CREDENTIALS }}
-  UAT_FUNCTIONS_APP_NAME: uattestfnc
-  PRD_SERVICE_CONNECTION: ${{ secrets. AZURE_CREDENTIALS }}
-  DEV_SQL_DB: devdbserver00
-  UAT_SQL_DB: uatdbserver00
-  PRD_SQL_DB: prddbserver00
-  PRD_ENVIRONMENT: PRD
-
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/uat'
+    runs-on: windows-2019
     env:
-      environment: ${{ github.ref == 'refs/heads/master' && env.DEV_ENVIRONMENT || github.ref == 'refs/heads/uat' && env.UAT_ENVIRONMENT || env.PRD_ENVIRONMENT }}
-      serviceConnection: ${{ github.ref == 'refs/heads/master' && env.DEV_SERVICE_CONNECTION || github.ref == 'refs/heads/uat' && env.UAT_SERVICE_CONNECTION || env.PRD_SERVICE_CONNECTION }}
-      functionsAppName: ${{ github.ref == 'refs/heads/master' && env.DEV_FUNCTIONS_APP_NAME || github.ref == 'refs/heads/uat' && env.UAT_FUNCTIONS_APP_NAME || env.PRD_FUNCTIONS_APP_NAME }}
-      dbServerName: ${{ github.ref == 'refs/heads/master' && env.DEV_SQL_DB || github.ref == 'refs/heads/uat' && env.UAT_SQL_DB || env.PRD_SQL_DB }}
-      
+      environment: ${{ github.ref == 'refs/heads/release' && 'UAT' || github.ref == 'refs/heads/master' && 'PRD' || 'SIT' }}
+      serviceConnection: ${{ github.ref == 'refs/heads/release' && 'ODE_SSET_UAT' || github.ref == 'refs/heads/master' && 'ODE_SSET_PROD' || 'ODE_SSET_DEV' }}
+      websiteUrl: ${{ github.ref == 'refs/heads/release' && 'https://stodessetuatacit.z9.web.core.windows.net/' || github.ref == 'refs/heads/master' && 'https://stodessetprdacit.z9.web.core.windows.net/' || 'https://stodessetsitacit.z9.web.core.windows.net/' }}
+      functionsAppName: ${{ github.ref == 'refs/heads/release' && 'acodesset-uat' || github.ref == 'refs/heads/master' && 'acodesset-prd' || 'acodesset-sit' }}
+      storageName: ${{ github.ref == 'refs/heads/release' && 'stodessetuatacit' || github.ref == 'refs/heads/master' && 'stodessetprdacit' || 'stodessetsitacit' }}
+      websiteStorageSasToken: ${{ github.ref == 'refs/heads/release' && secrets.WEBSITE_STORAGE_SAS_TOKEN_UAT || github.ref == 'refs/heads/master' && secrets.WEBSITE_STORAGE_SAS_TOKEN_PRD || secrets.WEBSITE_STORAGE_SAS_TOKEN_SIT }}
+      sqlConnectionString: ${{ github.ref == 'refs/heads/release' && secrets.UAT_SQL_CONNECTION_STRING || github.ref == 'refs/heads/master' && secrets.PRD_SQL_CONNECTION_STRING || secrets.SIT_SQL_CONNECTION_STRING }}
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -38,6 +27,37 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets[env.serviceConnection] }}
-        
-    - name: Stop Azure Function App
-      run: az functionapp stop --name devtestfnc --resource-group testfnc_group    
+
+    - name: Stop Functions
+      run: |
+        az functionapp stop --name ${{ env.functionsAppName }} --resource-group <resource-group-name>
+    
+    - name: Deploy Functions
+      uses: azure/functions-action@v1
+      with:
+        app-name: ${{ env.functionsAppName }}
+        package: '$(Pipeline.Workspace)/SSET/Functions/Functions.zip'
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
+    - name: Start Functions
+      run: |
+        az functionapp start --name ${{ env.functionsAppName }} --resource-group <resource-group-name>
+
+    - name: Deploy Front End
+      run: |
+        choco install azcopy10
+        azcopy copy $(Pipeline.Workspace)\SSET\Front\*.js 'https://$(storageName).blob.core.windows.net/$web$(websiteStorageSasToken)' --content-type="application/javascript; charset=utf8"
+        azcopy sync $(Pipeline.Workspace)\SSET\Front 'https://$(storageName).blob.core.windows.net/$web$(websiteStorageSasToken)' --delete-destination=true
+
+    - name: Check Front End
+      run: |
+        $response = Invoke-WebRequest -Uri $(websiteUrl)index.html -Method Head
+        if ($response.StatusCode -ne 200) {
+          throw
+        }
+      shell: pwsh
+      continue-on-error: true
+
+    - name: Deploy to SQL Database
+      run: |
+        sqlcmd -S <server-name> -d <database-name> -U <username> -P <password> -i path/to/your/sql/scripts.sql
