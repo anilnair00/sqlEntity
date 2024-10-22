@@ -33,10 +33,10 @@ jobs:
 
     # - name: Run .NET Tests
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
-
-    # - name: Create EF Core migration script ()
-    #   run: dotnet ef migrations script --project AzAiIntegration.DataAccess --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
-
+    
+    - name: Publish Functions
+      run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG --no-build --output ${{ github.workspace }}/Functions
+      
     - name: Create EF Core migration script ()
       run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
 
@@ -44,7 +44,7 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         name: SQLDB
-        path: ${{ github.workspace }}/myapp/migration.sql
+        path: ${{ github.workspace }}
 
   deploySqlscriptsonDev:
     runs-on: ubuntu-latest
