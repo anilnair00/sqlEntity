@@ -1,11 +1,12 @@
 name: SIT
 
 on:
-  push:
-    branches:
-      - develop
-      - release
-      - master
+   workflow_dispatch
+  # push:
+  #   branches:
+  #     - develop
+  #     - release
+  #     - master
 
 jobs:
   deploy:
