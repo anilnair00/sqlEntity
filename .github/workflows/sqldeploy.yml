@@ -72,10 +72,16 @@ jobs:
     - uses: azure/login@v1
       with: 
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       
     - name: Stop Azure Function App
-      run: az functionapp stop --name testfnc --resource-group testfnc_group    
+      run: az functionapp stop --name devtestfnc --resource-group testfnc_group    
+
+    - name: Deploy Functions
+      uses: azure/functions-action@v1
+      with:
+        app-name: devtestfnc
+        package: 'Functions.zip'
+        # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         
     # - name: Stop Azure Function App
     #   uses: azure/functions-action@v1
@@ -85,20 +91,20 @@ jobs:
     #     action: stop
     #     # resource-group-name: testfnc_group
 
-    - name: Azure SQL deploy-database
-      uses: azure/sql-action@v2.3
-      with:
-        server-name: testsqlserver00
-        connection-string: ${{ secrets.sqldbconnection}}
-        db-name: testsql001
-        path: 'migration.sql'
-        action: publish
-        # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
-        # dacpac-package: migration.sql
-        # script-file: ${{ github.workspace }}/myapp/migration.sql
+    # - name: Azure SQL deploy-database
+    #   uses: azure/sql-action@v2.3
+    #   with:
+    #     server-name: testsqlserver00
+    #     connection-string: ${{ secrets.sqldbconnection}}
+    #     db-name: testsql001
+    #     path: 'migration.sql'
+    #     action: publish
+    #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
+    #     # dacpac-package: migration.sql
+    #     # script-file: ${{ github.workspace }}/myapp/migration.sql
         
-    - name: start Azure Function App
-      run: az functionapp start --name testfnc --resource-group testfnc_group   
+    # - name: start Azure Function App
+    #   run: az functionapp start --name testfnc --resource-group testfnc_group   
     
     # - name: Login to Azure Subscription 1
     #   uses: azure/login@v1
