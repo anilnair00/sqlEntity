@@ -11,14 +11,11 @@ jobs:
   deploy:
     runs-on: windows-2019
     env:
-      environment: ${{ github.ref == 'refs/heads/release' && 'UAT' || github.ref == 'refs/heads/master' && 'PRD' || 'SIT' }}
-      serviceConnection: ${{ github.ref == 'refs/heads/release' && 'ODE_SSET_UAT' || github.ref == 'refs/heads/master' && 'ODE_SSET_PROD' || 'ODE_SSET_DEV' }}
-      websiteUrl: ${{ github.ref == 'refs/heads/release' && 'https://stodessetuatacit.z9.web.core.windows.net/' || github.ref == 'refs/heads/master' && 'https://stodessetprdacit.z9.web.core.windows.net/' || 'https://stodessetsitacit.z9.web.core.windows.net/' }}
-      functionsAppName: ${{ github.ref == 'refs/heads/release' && 'acodesset-uat' || github.ref == 'refs/heads/master' && 'acodesset-prd' || 'acodesset-sit' }}
-      storageName: ${{ github.ref == 'refs/heads/release' && 'stodessetuatacit' || github.ref == 'refs/heads/master' && 'stodessetprdacit' || 'stodessetsitacit' }}
-      websiteStorageSasToken: ${{ github.ref == 'refs/heads/release' && secrets.WEBSITE_STORAGE_SAS_TOKEN_UAT || github.ref == 'refs/heads/master' && secrets.WEBSITE_STORAGE_SAS_TOKEN_PRD || secrets.WEBSITE_STORAGE_SAS_TOKEN_SIT }}
-      sqlConnectionString: ${{ github.ref == 'refs/heads/release' && secrets.UAT_SQL_CONNECTION_STRING || github.ref == 'refs/heads/master' && secrets.PRD_SQL_CONNECTION_STRING || secrets.SIT_SQL_CONNECTION_STRING }}
-
+      environment: ${{ github.ref == 'refs/heads/master' && DEV || github.ref == 'refs/heads/uat' && UAT || PRD }}
+      serviceConnection: ${{ github.ref == 'refs/heads/master' && ${{ secrets.DEV_SERVICE_CONNECTION }} || github.ref == 'refs/heads/uat' && ${{ secrets.UAT_SERVICE_CONNECTION }}  || ${{ secrets.PRD_SERVICE_CONNECTION }} }}
+      functionsAppName: ${{ github.ref == 'refs/heads/master' && devtestfnc || github.ref == 'refs/heads/uat' && uattestfnc || prdtestfnc }}
+      dbServerName: ${{ github.ref == 'refs/heads/master' && devdbserver00 || github.ref == 'refs/heads/uat' && uatdbserver00 || prddbserver00 }}
+      
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
