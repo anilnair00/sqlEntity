@@ -25,20 +25,20 @@ jobs:
     - name: Install Entity Framework CLI
       run: dotnet tool install --global dotnet-ef
 
-    # - name: Build .NET Projects
-    #   run: dotnet build */*.csproj --configuration $BUILD_CONFIG
-
+    - name: Restore NuGet packages
+      run: dotnet restore
+      
     - name: Build .NET Projects
       run: dotnet build AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG
 
     # - name: Run .NET Tests
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
 
-    - name: Create EF Core migration script ()
-      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
-
     # - name: Create EF Core migration script ()
-    #   run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project Web --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
+    #   run: dotnet ef migrations script --project AzAiIntegration.DataAccess --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
+
+    - name: Create EF Core migration script ()
+      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/myapp/migration.sql
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
