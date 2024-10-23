@@ -44,13 +44,13 @@ jobs:
       run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
 
     - name: Zip Functions Artifact
-      run: zip -r ${{ github.workspace }}/Functions.zip ${{ github.workspace }}/Functions
+      run: zip -r ${{ github.workspace }}/Func.zip ${{ github.workspace }}/Functions
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
       with:
         name: SQLDB
-        path: ${{ github.workspace }}/Functions.zip
+        path: ${{ github.workspace }}/Func.zip
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
@@ -81,7 +81,7 @@ jobs:
       id: fa
       with:
         app-name: devtestfnc
-        package: 'Functions.zip'
+        package: 'Func.zip'
         # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         
 
