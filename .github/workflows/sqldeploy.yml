@@ -42,6 +42,10 @@ jobs:
         dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration Release --output ./output
         popd
 
+    - uses: azure/login@v1
+      with: 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
     - name: Deploy Functions
       uses: azure/functions-action@v1
       id: fa
