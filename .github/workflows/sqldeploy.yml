@@ -59,7 +59,7 @@ jobs:
       id: fa
       with:
         app-name: devtestfnc
-        package: 'myapp.zip'
+        package: './myapp.zip'
         # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}   
     
     # - name: Publish Functions
