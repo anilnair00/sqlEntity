@@ -49,7 +49,7 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         name: SQLDB
-        path: func.zip
+        path: Func.zip
     
     # - uses: azure/login@v1
     #   with: 
