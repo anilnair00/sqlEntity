@@ -8,6 +8,7 @@ on:
       - master
 env:
   BUILD_CONFIG: 'Release'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
 
 jobs:
   build:
@@ -33,53 +34,60 @@ jobs:
 
     # - name: Run .NET Tests
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
+
+    - name: 'Resolve Project Dependencies Using Dotnet'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        dotnet build --configuration Release --output ./output
+        popd
     
-    - name: Publish Functions
-      run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output ${{ github.workspace }}/Functions
+  #   - name: Publish Functions
+  #     run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output ${{ github.workspace }}/Functions
       
-    - name: Create EF Core migration script ()
-      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
+  #   - name: Create EF Core migration script ()
+  #     run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
 
-    - name: Zip Functions Artifact
-      run: zip -r ${{ github.workspace }}/Func.zip ${{ github.workspace }}/Functions
+  #   - name: Zip Functions Artifact
+  #     run: zip -r ${{ github.workspace }}/Func.zip ${{ github.workspace }}/Functions
 
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3.0.0
-      with:
-        name: SQLDB
-        path: ${{ github.workspace }}/Func.zip
+  #   - name: Upload Build Artifacts
+  #     uses: actions/upload-artifact@v3.0.0
+  #     with:
+  #       name: SQLDB
+  #       path: ${{ github.workspace }}/Func.zip
 
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3.0.0
-      with:
-        name: SQLDB
-        path: ${{ github.workspace }}/sql/migration.sql
+  #   - name: Upload Build Artifacts
+  #     uses: actions/upload-artifact@v3.0.0
+  #     with:
+  #       name: SQLDB
+  #       path: ${{ github.workspace }}/sql/migration.sql
 
-  deploySqlscriptsonDev:
-    runs-on: ubuntu-latest
-    needs: build
-    # environment: DEV
+  # deploySqlscriptsonDev:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   # environment: DEV
 
-    steps:
-    - name: Download Build Artifacts
-      uses: actions/download-artifact@v3.0.0
-      with:
-        name: SQLDB
+  #   steps:
+  #   - name: Download Build Artifacts
+  #     uses: actions/download-artifact@v3.0.0
+  #     with:
+  #       name: SQLDB
         
-    - uses: azure/login@v1
-      with: 
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #   - uses: azure/login@v1
+  #     with: 
+  #       creds: ${{ secrets.AZURE_CREDENTIALS }}
       
-    # - name: Stop Azure Function App
-    #   run: az functionapp stop --name devtestfnc --resource-group testfnc_group    
+  #   # - name: Stop Azure Function App
+  #   #   run: az functionapp stop --name devtestfnc --resource-group testfnc_group    
 
-    - name: Deploy Functions
-      uses: azure/functions-action@v1
-      id: fa
-      with:
-        app-name: devtestfnc
-        package: 'Func.zip'
-        # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+  #   - name: Deploy Functions
+  #     uses: azure/functions-action@v1
+  #     id: fa
+  #     with:
+  #       app-name: devtestfnc
+  #       package: 'Func.zip'
+  #       # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         
 
     # - name: Azure SQL deploy-database
