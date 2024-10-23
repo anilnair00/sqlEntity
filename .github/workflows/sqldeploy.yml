@@ -42,11 +42,14 @@ jobs:
         dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration Release --output ./${{ github.workspace }}/Functions
         popd
 
+    - name: Zip Functions Artifact
+      run: zip -r Func.zip ./${{ github.workspace }}/Functions
+    
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
       with:
         name: SQLDB
-        path: ./${{ github.workspace }}/Functions
+        path: func.zip
     
     # - uses: azure/login@v1
     #   with: 
