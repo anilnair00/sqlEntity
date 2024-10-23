@@ -39,7 +39,7 @@ jobs:
       run: |
           dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output  $${{env.DOTNET_ROOT}}/functionapp
           cd $${{env.DOTNET_ROOT}}/functionapp
-          zip -r ../app.zip
+          zip -r ../functionapp.zip
       
     # - name: Zip Functions Artifact
     #   run: zip -r Func.zip Functions/
@@ -48,7 +48,7 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         name: SQLDB
-        path: $${{env.DOTNET_ROOT}}/app.zip
+        path: $${{env.DOTNET_ROOT}}/functionapp.zip
     
     - uses: azure/login@v1
       with: 
