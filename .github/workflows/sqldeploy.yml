@@ -40,11 +40,11 @@ jobs:
     - name: Publish Functions
       run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG --output ${{ github.workspace }}/Functions
       
-    # - name: Create EF Core migration script ()
-    #   run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
+    - name: Create EF Core migration script ()
+      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
 
-    # - name: Zip Functions Artifact
-    #   run: zip -r ${{ github.workspace }}/Functions.zip ${{ github.workspace }}/Functions
+    - name: Zip Functions Artifact
+      run: zip -r ${{ github.workspace }}/Functions.zip ${{ github.workspace }}/Functions
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
@@ -52,11 +52,11 @@ jobs:
         name: SQLDB
         path: ${{ github.workspace }}/Functions
 
-    # - name: Upload Build Artifacts
-    #   uses: actions/upload-artifact@v3.0.0
-    #   with:
-    #     name: SQLDB
-    #     path: ${{ github.workspace }}/sql/migration.sql
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: SQLDB
+        path: ${{ github.workspace }}/sql/migration.sql
 
   deploySqlscriptsonDev:
     runs-on: ubuntu-latest
@@ -81,7 +81,7 @@ jobs:
       id: fa
       with:
         app-name: devtestfnc
-        package: './home/runner/work/sqlEntity/sqlEntity/Functions/'
+        package: 'functions.zip'
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         
     # - name: Stop Azure Function App
