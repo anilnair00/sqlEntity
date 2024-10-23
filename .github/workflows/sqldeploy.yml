@@ -39,11 +39,11 @@ jobs:
       shell: bash
       run: |
         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-        dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration Release --output ${{ github.workspace }}/Functions
+        dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration Release --output Functions
         popd
 
     - name: Zip Functions Artifact
-      run: zip -r Func.zip ${{ github.workspace }}/Functions
+      run: zip -r Func.zip Functions
     
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
