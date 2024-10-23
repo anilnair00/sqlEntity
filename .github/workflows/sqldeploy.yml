@@ -35,33 +35,33 @@ jobs:
     # - name: Run .NET Tests
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
 
-    - name: 'Resolve Project Dependencies Using Dotnet'
-      shell: bash
-      run: |
-        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-        dotnet build --configuration Release --output ./output
-        popd
+    # - name: 'Resolve Project Dependencies Using Dotnet'
+    #   shell: bash
+    #   run: |
+    #     pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+    #     dotnet build --configuration Release --output ./output
+    #     popd
     
-  #   - name: Publish Functions
-  #     run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output ${{ github.workspace }}/Functions
+    - name: Publish Functions
+      run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output ${{ github.workspace }}/Functions
       
-  #   - name: Create EF Core migration script ()
-  #     run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
+    - name: Create EF Core migration script ()
+      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
 
-  #   - name: Zip Functions Artifact
-  #     run: zip -r ${{ github.workspace }}/Func.zip ${{ github.workspace }}/Functions
+    - name: Zip Functions Artifact
+      run: zip -r Func.zip ${{ github.workspace }}/Functions
 
-  #   - name: Upload Build Artifacts
-  #     uses: actions/upload-artifact@v3.0.0
-  #     with:
-  #       name: SQLDB
-  #       path: ${{ github.workspace }}/Func.zip
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: SQLDB
+        path: ./Func.zip
 
-  #   - name: Upload Build Artifacts
-  #     uses: actions/upload-artifact@v3.0.0
-  #     with:
-  #       name: SQLDB
-  #       path: ${{ github.workspace }}/sql/migration.sql
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: SQLDB
+        path: ${{ github.workspace }}/sql/migration.sql
 
   # deploySqlscriptsonDev:
   #   runs-on: ubuntu-latest
