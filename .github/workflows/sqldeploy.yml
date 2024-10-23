@@ -42,17 +42,23 @@ jobs:
         dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration Release --output ./${{ github.workspace }}/Functions
         popd
 
-    - uses: azure/login@v1
-      with: 
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-    - name: Deploy Functions
-      uses: azure/functions-action@v1
-      id: fa
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3.0.0
       with:
-        app-name: devtestfnc
-        package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/${{ github.workspace }}/Functions'
-        # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}   
+        name: SQLDB
+        path: ./${{ github.workspace }}/Functions
+    
+    # - uses: azure/login@v1
+    #   with: 
+    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    # - name: Deploy Functions
+    #   uses: azure/functions-action@v1
+    #   id: fa
+    #   with:
+    #     app-name: devtestfnc
+    #     package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/${{ github.workspace }}/Functions'
+    #     # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}   
     
     # - name: Publish Functions
     #   run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output ${{ github.workspace }}/Functions
