@@ -53,13 +53,19 @@ jobs:
     - uses: azure/login@v1
       with: 
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
+
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: SQLDB
+        path: .SQLDB
+  
     - name: Deploy Functions
       uses: azure/functions-action@v1
       id: fa
       with:
         app-name: devtestfnc
-        package: './myapp.zip'
+        package: .SQLDB/myapp.zip
         # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}   
     
     # - name: Publish Functions
@@ -93,6 +99,7 @@ jobs:
   #     uses: actions/download-artifact@v3.0.0
   #     with:
   #       name: SQLDB
+          
         
   #   - uses: azure/login@v1
   #     with: 
