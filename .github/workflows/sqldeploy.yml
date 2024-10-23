@@ -81,7 +81,7 @@ jobs:
       id: fa
       with:
         app-name: devtestfnc
-        package: './*'
+        package: './home/runner/work/sqlEntity/sqlEntity/Functions/'
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         
     # - name: Stop Azure Function App
