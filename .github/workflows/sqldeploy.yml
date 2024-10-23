@@ -36,10 +36,10 @@ jobs:
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
 
     - name: Publish Functions
-      run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output ./
+      run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output Functions/
       
     - name: Zip Functions Artifact
-      run: zip -r Func.zip ./
+      run: zip -r Func.zip Functions/
     
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
