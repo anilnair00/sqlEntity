@@ -52,11 +52,11 @@ jobs:
     #       cd $${{env.DOTNET_ROOT}}/functionapp
     #       zip -r ../myapp.zip .
           
-    # - name: Upload Build Artifacts
-    #   uses: actions/upload-artifact@v3.0.0
-    #   with:
-    #     name: SQLDB
-    #     path: ${{ github.workspace }}/myapp.zip
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: SQLDB
+        path: ${{ github.workspace }}/myapp.zip
     
     # - uses: azure/login@v1
     #   with: 
