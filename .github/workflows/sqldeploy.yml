@@ -8,6 +8,7 @@ on:
       - master
 env:
   BUILD_CONFIG: 'Release'
+  DOTNET_ROOT: '/home/runner/.dotnet'
 
 jobs:
   build:
@@ -19,8 +20,9 @@ jobs:
 
     - name: Set up .NET Core SDK
       uses: actions/setup-dotnet@v2
-      with:
+      with: 
         dotnet-version: '8.0'
+
 
     - name: Install Entity Framework CLI
       run: |
@@ -28,13 +30,15 @@ jobs:
 
     - name:  Add .NET Core SDK tools
       run: |
-         # cat << \EOF >> ~/.bash_profile
+         # # cat << \EOF >> ~/.bash_profile
+         # # export PATH="$PATH:/home/runner/.dotnet/tools"
+         # # EOF
          # export PATH="$PATH:/home/runner/.dotnet/tools"
-         # EOF
-         export PATH="$PATH:/home/runner/.dotnet/tools"
+         export DOTNET_ROOT=$HOME/.dotnet
+         export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
 
-    # - name: Verify dotnet-ef Installation
-    #   run: dotnet-ef --version     
+    - name: Verify dotnet-ef Installation
+      run: dotnet-ef --version     
       
     - name: Restore NuGet packages
       run: dotnet restore 
