@@ -26,7 +26,10 @@ jobs:
       run: dotnet tool install --global dotnet-ef
 
     - name: Restore NuGet packages
-      run: dotnet restore AirPassengerProtection.Integration.sln
+      run: dotnet restore 
+      
+    # - name: Restore NuGet packages
+    #   run: dotnet restore AirPassengerProtection.Integration.sln
       
     - name: Build .NET Projects
       run: dotnet build AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG
