@@ -28,13 +28,13 @@ jobs:
       run: |
           dotnet tool install --global dotnet-ef
 
-    - name:  Add .NET Core SDK tools
-      run: |
-         export DOTNET_ROOT=$HOME/.dotnet
-         export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
+    # - name:  Add .NET Core SDK tools
+    #   run: |
+    #      export DOTNET_ROOT=$HOME/.dotnet
+    #      export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
 
-    # - name: Verify dotnet-ef Installation
-    #   run: dotnet-ef --version     
+    - name: Verify dotnet-ef Installation
+      run: dotnet-ef --version     
       
     - name: Restore NuGet packages
       run: dotnet restore 
