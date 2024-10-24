@@ -34,8 +34,8 @@ jobs:
     #      export DOTNET_ROOT=$HOME/.dotnet
     #      export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
 
-    - name: Verify dotnet-ef Installation
-      run: dotnet-ef --version     
+    # - name: Verify dotnet-ef Installation
+    #   run: dotnet-ef --version     
       
     - name: Restore NuGet packages
       run: dotnet restore 
