@@ -27,6 +27,7 @@ jobs:
     - name: Install Entity Framework CLI
       run: |
           dotnet tool install --global dotnet-ef
+          export PATH="$PATH:/home/runner/.dotnet/tools"
 
     # - name:  Add .NET Core SDK tools
     #   run: |
