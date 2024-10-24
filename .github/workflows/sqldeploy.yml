@@ -22,11 +22,8 @@ jobs:
       with:
         dotnet-version: '8.0'
 
-    # - name: Install Entity Framework CLI
-    #   run: dotnet tool install --global dotnet-ef
-
     - name: Install Entity Framework CLI
-      run: dotnet tool install dotnet-ef
+      run: dotnet tool install --global dotnet-ef
 
     - name: Verify dotnet-ef Installation
       run: dotnet ef --version
