@@ -22,9 +22,15 @@ jobs:
       with:
         dotnet-version: '8.0'
 
-    - name: Install Entity Framework CLI
-      run: dotnet tool install --global dotnet-ef
+    # - name: Install Entity Framework CLI
+    #   run: dotnet tool install --global dotnet-ef
 
+    - name: Install Entity Framework CLI
+      run: dotnet tool install dotnet-ef
+
+    - name: Verify dotnet-ef Installation
+      run: dotnet ef --version
+      
     - name: Restore NuGet packages
       run: dotnet restore 
       
