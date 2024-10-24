@@ -100,7 +100,7 @@ jobs:
         server-name: testserver0002
         connection-string: ${{ secrets.sqldbconnection}}
          # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
-        path: 'migration.sql'
+        path: .SQLDB/migration.sql
         action: publish
         # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
         # dacpac-package: migration.sql
