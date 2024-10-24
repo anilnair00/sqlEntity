@@ -24,8 +24,8 @@ jobs:
 
     - name: Install Entity Framework CLI
       run: |
-          dotnet tool install --global dotnet-ef
-          dotnet tool restore
+          dotnet tooll install --global dotnet-ef
+          dotnet-ef tool restore
 
     - name: Verify dotnet-ef Installation
       run: dotnet-ef --version
