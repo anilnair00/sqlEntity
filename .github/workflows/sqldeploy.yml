@@ -28,7 +28,7 @@ jobs:
           dotnet tool restore
 
     - name: Verify dotnet-ef Installation
-      run: dotnet ef --version
+      run: dotnet-ef --version
       
     - name: Restore NuGet packages
       run: dotnet restore 
