@@ -8,7 +8,6 @@ on:
       - master
 env:
   BUILD_CONFIG: 'Release'
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
 
 jobs:
   build:
@@ -27,7 +26,7 @@ jobs:
       run: dotnet tool install --global dotnet-ef
 
     - name: Restore NuGet packages
-      run: dotnet restore
+      run: dotnet restore AirPassengerProtection.Integration.sln
       
     - name: Build .NET Projects
       run: dotnet build AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG
@@ -37,36 +36,45 @@ jobs:
 
     - name: Publish Functions
       run: |
-          dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output  $${{env.DOTNET_ROOT}}/functionapp
-          cd $${{env.DOTNET_ROOT}}/functionapp
+          dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/functionapp
+          
+    - name: Zip Functions Artifact
+      run: |
+          cd ${{ github.workspace }}/functionapp
           zip -r ../myapp.zip .
-      
-    # - name: Zip Functions Artifact
-    #   run: zip -r Func.zip Functions/
-    
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3.0.0
-      with:
-        name: SQLDB
-        path: $${{env.DOTNET_ROOT}}/myapp.zip
-    
-    - uses: azure/login@v1
-      with: 
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Download Build Artifacts
-      uses: actions/download-artifact@v3.0.0
-      with:
-        name: SQLDB
-        path: .SQLDB
+    # - name: Publish Functions
+    #   run: |
+    #       dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output  $${{env.DOTNET_ROOT}}/functionapp
+          
+    # - name: Zip Functions Artifact
+    #   run: |
+    #       cd $${{env.DOTNET_ROOT}}/functionapp
+    #       zip -r ../myapp.zip .
+          
+    # - name: Upload Build Artifacts
+    #   uses: actions/upload-artifact@v3.0.0
+    #   with:
+    #     name: SQLDB
+    #     path: ${{ github.workspace }}/myapp.zip
+    
+    # - uses: azure/login@v1
+    #   with: 
+    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # - name: Download Build Artifacts
+    #   uses: actions/download-artifact@v3.0.0
+    #   with:
+    #     name: SQLDB
+    #     path: .SQLDB
   
-    - name: Deploy Functions
-      uses: azure/functions-action@v1
-      id: fa
-      with:
-        app-name: devtestfnc
-        package: .SQLDB/myapp.zip
-        # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}   
+    # - name: Deploy Functions
+    #   uses: azure/functions-action@v1
+    #   id: fa
+    #   with:
+    #     app-name: devtestfnc
+    #     package: .SQLDB/myapp.zip
+    #     # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}   
     
     # - name: Publish Functions
     #   run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output ${{ github.workspace }}/Functions
