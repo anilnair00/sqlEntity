@@ -26,8 +26,18 @@ jobs:
       run: |
           dotnet tool install --global dotnet-ef
 
+    - name:  Add .NET Core SDK tools
+      run: |
+         cat << \EOF >> ~/.bash_profile
+         export PATH="$PATH:/home/runner/.dotnet/tools"
+         EOF
+# You can add it to the current session by running the following command:
+
+# export PATH="$PATH:/home/runner/.dotnet/tools"
+
     - name: Verify dotnet-ef Installation
       run: dotnet-ef --version
+      
       
     - name: Restore NuGet packages
       run: dotnet restore 
