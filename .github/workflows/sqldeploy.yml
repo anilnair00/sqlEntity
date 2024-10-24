@@ -43,6 +43,9 @@ jobs:
           cd ${{ github.workspace }}/functionapp
           zip -r ../myapp.zip .
 
+    - name: Create EF Core migration script ()
+      run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
+
     # - name: Publish Functions
     #   run: |
     #       dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output  $${{env.DOTNET_ROOT}}/functionapp
@@ -57,108 +60,31 @@ jobs:
       with:
         name: SQLDB
         path: ${{ github.workspace }}/myapp.zip
-    
-    # - uses: azure/login@v1
-    #   with: 
-    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # - name: Download Build Artifacts
-    #   uses: actions/download-artifact@v3.0.0
-    #   with:
-    #     name: SQLDB
-    #     path: .SQLDB
-  
-    # - name: Deploy Functions
-    #   uses: azure/functions-action@v1
-    #   id: fa
-    #   with:
-    #     app-name: devtestfnc
-    #     package: .SQLDB/myapp.zip
-    #     # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}   
-    
-    # - name: Publish Functions
-    #   run: dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output ${{ github.workspace }}/Functions
-      
-    # - name: Create EF Core migration script ()
-    #   run: dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: SQLDB
+        path: ${{ github.workspace }}/sql/migration.sql
 
-    # - name: Zip Functions Artifact
-    #   run: zip -r Func.zip ${{ github.workspace }}/Functions
+  deploySqlscriptsonDev:
+    runs-on: ubuntu-latest
+    needs: build
+    # environment: DEV
 
-    # - name: Upload Build Artifacts
-    #   uses: actions/upload-artifact@v3.0.0
-    #   with:
-    #     name: SQLDB
-    #     path: ./Func.zip
+    steps:
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: SQLDB
+        path: .SQLDB
+                  
+    - uses: azure/login@v1
+      with: 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # - name: Upload Build Artifacts
-    #   uses: actions/upload-artifact@v3.0.0
-    #   with:
-    #     name: SQLDB
-    #     path: ${{ github.workspace }}/sql/migration.sql
-
-  # deploySqlscriptsonDev:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   # environment: DEV
-
-  #   steps:
-  #   - name: Download Build Artifacts
-  #     uses: actions/download-artifact@v3.0.0
-  #     with:
-  #       name: SQLDB
-          
-        
-  #   - uses: azure/login@v1
-  #     with: 
-  #       creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-  #   # - name: Stop Azure Function App
-  #   #   run: az functionapp stop --name devtestfnc --resource-group testfnc_group    
-
-  #   - name: Deploy Functions
-  #     uses: azure/functions-action@v1
-  #     id: fa
-  #     with:
-  #       app-name: devtestfnc
-  #       package: 'Func.zip'
-  #       # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-        
-
-    # - name: Azure SQL deploy-database
-    #   uses: azure/sql-action@v2.3
-    #   with:
-    #     server-name: testsqlserver00
-    #     connection-string: ${{ secrets.sqldbconnection}}
-    #     db-name: testsql001
-    #     path: 'migration.sql'
-    #     action: publish
-    #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
-    #     # dacpac-package: migration.sql
-    #     # script-file: ${{ github.workspace }}/myapp/migration.sql
-        
-    # - name: start Azure Function App
-    #   run: az functionapp start --name testfnc --resource-group testfnc_group   
-    
-    # - name: Login to Azure Subscription 1
-    #   uses: azure/login@v1
-    #   with:
-    #    client-id: ${{ secrets.AZURE_CLIENT_ID }}
-    #    tenat-id: ${{ secrets.AZURE_TENANT_ID }}
-    #    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    # - name: Stop Azure Function App
-    #   uses: azure/webapps-deploy@v2
-    #   with:
-    #     app-name: ${{ secrets.FUNCTIONS_APP_NAME }}
-    #     action: 'stop'
-
-    # - name: Login to Azure Subscription 2
-    #   uses: azure/login@v1
-    #   with:
-    #    client-id: ${{ secrets.AZURE_CLIENT_ID }}
-    #    tenat-id: ${{ secrets.AZURE_TENANT_ID }}
-    #    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Stop Azure Function App
+      run: az functionapp stop --name testfnc --resource-group testproject   
 
     # - name: Fetch Secrets from Azure key Vault
     #   id: keyvault
@@ -167,27 +93,26 @@ jobs:
     #     keyvault: ${{ secrets.KEYVAULT_NAME }}
     #     secrets: |
     #       db-connection-string
+    
+    - name: Azure SQL deploy-database
+      uses: azure/sql-action@v2.3
+      with:
+        server-name: testserver0002
+        connection-string: ${{ secrets.sqldbconnection}}
+         # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
+        path: 'migration.sql'
+        action: publish
+        # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
+        # dacpac-package: migration.sql
+        # script-file: ${{ github.workspace }}/myapp/migration.sql
 
-    # - name: Azure SQL deploy-database
-    #   uses: azure/sql-action@v1.3
-    #   with:
-    #     server-name: ${{ secrets.SQL_SERVER_NAME }}
-    #     connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
-    #     db-name: ${{ secrets.SQL_DB_NAME }}
-    #     script-file: migration.sql
-    #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
-    #     # script-file: ${{ github.workspace }}/myapp/migration.sql
-
-    # - name: Login to Azure Subscription 1
-    #   uses: azure/login@v1
-    #   with:
-    #    client-id: ${{ secrets.AZURE_CLIENT_ID }}
-    #    tenat-id: ${{ secrets.AZURE_TENANT_ID }}
-    #    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    # - name: Start Azure Function App
-    #   uses: azure/webapps-deploy@v2
-    #   with:
-    #     app-name: ${{ secrets.FUNCTIONS_APP_NAME }}
-    #     slot-name: 'production'
-    #     action: 'start'
+    - name: Deploy Functions
+      uses: azure/functions-action@v1
+      id: fa
+      with:
+        app-name: devtestfnc
+        package: .SQLDB/myapp.zip
+        # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}        
+        
+    - name: start Azure Function App
+      run: az functionapp start --name testfnc --resource-group testproject   
