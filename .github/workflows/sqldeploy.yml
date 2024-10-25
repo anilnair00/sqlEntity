@@ -27,8 +27,11 @@ jobs:
     #   run: |
     #       dotnet tool install --global dotnet-ef
           
-    # - name: Add .NET Core SDK tools to PATH
-    #   run: echo 'export PATH="$PATH:/home/runner/.dotnet/tools"' >> $GITHUB_ENV
+    - name: Add .NET Core SDK tools to PATH
+      run: |
+            # echo 'export PATH="$PATH:/home/runner/.dotnet/tools"' >> $GITHUB_ENV
+            sudo apt-get update
+            sudo apt-get install -y zip
       
     # - name:  Add .NET Core SDK tools
     #   run: |
