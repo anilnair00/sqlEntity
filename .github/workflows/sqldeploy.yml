@@ -82,7 +82,11 @@ jobs:
       with:
         name: SQLDB
         path: .SQLDB
-                  
+        
+    - name: Install Azure CLI
+      run: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash         
+        
     - uses: azure/login@v1
       with: 
         creds: ${{ secrets.AZURE_CREDENTIALS }}
