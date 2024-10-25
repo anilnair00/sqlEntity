@@ -68,7 +68,7 @@ jobs:
         path: ${{ github.workspace }}/sql/migration.sql
 
   deploySqlscriptsonDev:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     # environment: DEV
 
