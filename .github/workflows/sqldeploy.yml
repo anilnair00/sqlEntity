@@ -44,6 +44,9 @@ jobs:
     - name: Build .NET Projects
       run: dotnet build AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG
 
+    - name: Build .NET Projects
+      run: dotnet build ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG
+ 
     # - name: Run .NET Tests
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
 
