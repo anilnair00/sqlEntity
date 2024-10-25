@@ -28,11 +28,7 @@ jobs:
       run: |
           dotnet tool install --global dotnet-ef
           export PATH="$PATH:/home/runner/.dotnet/tools"        
-          
-    - name: Install Azure CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash   
-        
+                  
     - name: Restore NuGet packages
       run: dotnet restore 
       
