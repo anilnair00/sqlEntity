@@ -9,7 +9,7 @@ on:
 env:
   BUILD_CONFIG: 'Release'
   DOTNET_ROOT: '/home/runner/.dotnet'
-  PATH: "$PATH:/home/sam/.dotnet/tools"
+  PATH: '$PATH:/home/sam/.dotnet/tools'
 
 jobs:
   build:
@@ -17,10 +17,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up .NET Core SDK
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4
       with: 
         dotnet-version: '8.0'
         
