@@ -9,7 +9,7 @@ on:
 env:
   BUILD_CONFIG: 'Release'
   DOTNET_ROOT: '/home/runner/.dotnet'
-  # PATH: '$PATH:/home/sam/.dotnet/tools'
+  # PATH: '$PATH:/home/runner/.dotnet/tools'
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
     - name: Install Entity Framework CLI
       run: |
           dotnet tool install --global dotnet-ef
-          export PATH="$PATH:/home/sam/.dotnet/tools"
+          export PATH="$PATH:/home/runner/.dotnet/tools"
           
           
     # - name: Add .NET Core SDK tools to PATH
@@ -43,7 +43,7 @@ jobs:
 
     - name: Verify dotnet-ef Installation
       run: |
-           export PATH="$PATH:/home/sam/.dotnet/tools"
+           export PATH="$PATH:/home/runner/.dotnet/tools"
            dotnet-ef --version
           
       
@@ -70,7 +70,7 @@ jobs:
 
     - name: Create EF Core migration script ()
       run: |
-          export PATH="$PATH:/home/sam/.dotnet/tools"
+          export PATH="$PATH:/home/runner/.dotnet/tools"
           dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
 
     # - name: Publish Functions
