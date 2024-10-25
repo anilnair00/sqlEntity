@@ -9,6 +9,7 @@ on:
 env:
   BUILD_CONFIG: 'Release'
   DOTNET_ROOT: '/home/runner/.dotnet'
+  PATH: "$PATH:/home/sam/.dotnet/tools"
 
 jobs:
   build:
