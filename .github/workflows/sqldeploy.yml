@@ -8,8 +8,8 @@ on:
       - master
 env:
   BUILD_CONFIG: 'Release'
-  DOTNET_ROOT: '/home/runner/.dotnet'
-  # PATH: '$PATH:/home/runner/.dotnet/tools'
+  # DOTNET_ROOT: '/home/runner/.dotnet'
+
 
 jobs:
   build:
@@ -27,24 +27,12 @@ jobs:
     - name: Install Entity Framework CLI
       run: |
           dotnet tool install --global dotnet-ef
-          export PATH="$PATH:/home/runner/.dotnet/tools"
-          
-          
-    # - name: Add .NET Core SDK tools to PATH
-    #   run: |
-    #         # echo 'export PATH="$PATH:/home/runner/.dotnet/tools"' >> $GITHUB_ENV
-    #         sudo apt-get update
-    #         sudo apt-get install -y zip
-      
-    # - name:  Add .NET Core SDK tools
-    #   run: |
-    #      export DOTNET_ROOT=$HOME/.dotnet
-    #      export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
+          export PATH="$PATH:/home/runner/.dotnet/tools"        
 
-    - name: Verify dotnet-ef Installation
-      run: |
-           export PATH="$PATH:/home/runner/.dotnet/tools"
-           dotnet-ef --version
+    # - name: Verify dotnet-ef Installation
+    #   run: |
+    #        export PATH="$PATH:/home/runner/.dotnet/tools"
+    #        dotnet-ef --version
           
       
     - name: Restore NuGet packages
@@ -72,15 +60,6 @@ jobs:
       run: |
           export PATH="$PATH:/home/runner/.dotnet/tools"
           dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
-
-    # - name: Publish Functions
-    #   run: |
-    #       dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output  $${{env.DOTNET_ROOT}}/functionapp
-          
-    # - name: Zip Functions Artifact
-    #   run: |
-    #       cd $${{env.DOTNET_ROOT}}/functionapp
-    #       zip -r ../myapp.zip .
           
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
