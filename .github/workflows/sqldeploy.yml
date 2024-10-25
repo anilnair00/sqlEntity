@@ -28,13 +28,7 @@ jobs:
       run: |
           dotnet tool install --global dotnet-ef
           export PATH="$PATH:/home/runner/.dotnet/tools"        
-
-    # - name: Verify dotnet-ef Installation
-    #   run: |
-    #        export PATH="$PATH:/home/runner/.dotnet/tools"
-    #        dotnet-ef --version
-          
-      
+    
     - name: Restore NuGet packages
       run: dotnet restore 
       
@@ -42,10 +36,7 @@ jobs:
     #   run: dotnet restore AirPassengerProtection.Integration.sln
       
     - name: Build .NET Projects
-      run: dotnet build AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG
-
-    - name: Build .NET Projects
-      run: dotnet build ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG
+      run: dotnet build ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG --no-restore
  
     # - name: Run .NET Tests
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
