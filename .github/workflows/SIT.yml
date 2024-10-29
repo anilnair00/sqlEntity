@@ -12,11 +12,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      environment: ${{ github.ref == 'refs/heads/master' && 'DEV' || github.ref == 'refs/heads/uat' && 'UAT' || 'PRD' }}
-      serviceConnection: ${{ github.ref == 'refs/heads/master' && '${{ AZURE_CREDENTIALS }}' || github.ref == 'refs/heads/uat' && '${{ secrets.AZURE_CREDENTIALS }}'  || '${{ secrets.AZURE_CREDENTIALS }}' }}
-      functionsAppName: ${{ github.ref == 'refs/heads/master' && 'devtestfnc' || github.ref == 'refs/heads/uat' && 'uattestfnc' || 'prdtestfnc' }}
-      dbServerName: ${{ github.ref == 'refs/heads/master' && 'devdbserver00' || github.ref == 'refs/heads/uat' && 'uatdbserver00' || 'prddbserver00' }}
+    # env:
+    #   environment: ${{ github.ref == 'refs/heads/master' && 'DEV' || github.ref == 'refs/heads/uat' && 'UAT' || 'PRD' }}
+    #   serviceConnection: ${{ github.ref == 'refs/heads/master' && '${{ AZURE_CREDENTIALS }}' || github.ref == 'refs/heads/uat' && '${{ secrets.AZURE_CREDENTIALS }}'  || '${{ secrets.AZURE_CREDENTIALS }}' }}
+    #   functionsAppName: ${{ github.ref == 'refs/heads/master' && 'devtestfnc' || github.ref == 'refs/heads/uat' && 'uattestfnc' || 'prdtestfnc' }}
+    #   dbServerName: ${{ github.ref == 'refs/heads/master' && 'devdbserver00' || github.ref == 'refs/heads/uat' && 'uatdbserver00' || 'prddbserver00' }}
       
     steps:
     - name: Checkout code
