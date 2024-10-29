@@ -6,6 +6,7 @@ on:
       - develop
       - release
       - master
+      
   workflow_dispatch:
 
 jobs:
