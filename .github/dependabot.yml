@@ -1,14 +1,14 @@
 # The package ecosystems to update is .Net and the package manifests are located in the project files.
 
-version: 2
-updates:
-  - package-ecosystem: "nuget"
-    directory: "/" # Location of package manifests (project files)
-    schedule:
-      interval: "weekly"
-    reviewers:
-      - Arshdeep-Singh_acgithub
-      - Edison-Chai_acgithub
-      - Manish-Sharma_acgithub
-      - SyedHamza-Husain_acgithub
-      - Sylvain-Groulx_acgithub
+# version: 2
+# updates:
+#   - package-ecosystem: "nuget"
+#     directory: "/" # Location of package manifests (project files)
+#     schedule:
+#       interval: "weekly"
+#     reviewers:
+#       - Arshdeep-Singh_acgithub
+#       - Edison-Chai_acgithub
+#       - Manish-Sharma_acgithub
+#       - SyedHamza-Husain_acgithub
+#       - Sylvain-Groulx_acgithub
