@@ -1,13 +1,11 @@
 name: Build and Deploy
-
 on:
   push:
     branches:
       - develop
       - release
       - master
-    paths:
-    - .github/workflows/sqldeploy.yml
+
 env:
   BUILD_CONFIG: 'Release'
   # DOTNET_ROOT: '/home/runner/.dotnet'
