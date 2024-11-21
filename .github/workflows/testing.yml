@@ -40,7 +40,7 @@ jobs:
     #   run: dotnet restore AirPassengerProtection.Integration.sln
       
     - name: Build .NET Projects
-      run: dotnet build ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG --no-restore
+      run: MSBuild.exe ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG --no-restore
  
     # - name: Run .NET Tests
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
