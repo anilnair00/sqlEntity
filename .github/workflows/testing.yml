@@ -43,7 +43,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
       
     - name: Build .NET Projects
-      run: msbuild.exe ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG --no-restore
+      run: msbuild.exe ./AirPassengerProtection.Integration.sln
  
     # - name: Run .NET Tests
     #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
