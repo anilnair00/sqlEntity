@@ -38,6 +38,9 @@ jobs:
       
     # - name: Restore NuGet packages
     #   run: dotnet restore AirPassengerProtection.Integration.sln
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
       
     - name: Build .NET Projects
       run: msbuild.exe ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG --no-restore
