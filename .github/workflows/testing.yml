@@ -117,7 +117,6 @@ jobs:
     #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
     #     # dacpac-package: migration.sql
     #     # script-file: ${{ github.workspace }}/myapp/migration.sql
-
     - name: Deploy Functions
       uses: azure/functions-action@v1
       id: fa
