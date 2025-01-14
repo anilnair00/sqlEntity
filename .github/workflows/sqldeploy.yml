@@ -19,7 +19,7 @@ permissions:
   
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: runner1
 
     steps:
     - name: Checkout repository
@@ -64,17 +64,17 @@ jobs:
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: SQLDB
+        name: APPX
         path: ${{ github.workspace }}/myapp.zip
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: SQLDB
+        name: APPX
         path: ${{ github.workspace }}/sql/migration.sql
 
   deploySqlscriptsonDev:
-    runs-on: ubuntu-latest
+    runs-on: runner1
     needs: build
     # environment: DEV
 
@@ -82,8 +82,8 @@ jobs:
     - name: Download Build Artifacts
       uses: actions/download-artifact@v3.0.0
       with:
-        name: SQLDB
-        path: .SQLDB
+        name: APPX
+        path: .APPX
         
     - name: Install Azure CLI
       run: |
@@ -108,24 +108,24 @@ jobs:
     #     secrets: |
     #       db-connection-string
     
-    - name: Azure SQL deploy-database
-      uses: azure/sql-action@v2.3
-      with:
-        server-name: testserver0002
-        connection-string: ${{ secrets.sqldbconnection}}
-         # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
-        path: .SQLDB/migration.sql
-        action: publish
-        # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
-        # dacpac-package: migration.sql
-        # script-file: ${{ github.workspace }}/myapp/migration.sql
+    # - name: Azure SQL deploy-database
+    #   uses: azure/sql-action@v2.3
+    #   with:
+    #     server-name: testserver0002
+    #     connection-string: ${{ secrets.sqldbconnection}}
+    #      # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
+    #     path: .SQLDB/migration.sql
+    #     action: publish
+    #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
+    #     # dacpac-package: migration.sql
+    #     # script-file: ${{ github.workspace }}/myapp/migration.sql
 
     - name: Deploy Functions
       uses: azure/functions-action@v1
       id: fa
       with:
         app-name: testfnc
-        package: .SQLDB/myapp.zip
+        package: .APPX/myapp.zip
         # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}        
         
     - name: start Azure Function App
