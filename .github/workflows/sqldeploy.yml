@@ -18,7 +18,7 @@ permissions:
   
 jobs:
   build:
-    runs-on: runner1
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -73,7 +73,7 @@ jobs:
         path: ${{ github.workspace }}/sql/migration.sql
 
   deploySqlscriptsonDev:
-    runs-on: runner1
+    runs-on: ubuntu-latest
     needs: build
     # environment: DEV
 
@@ -107,17 +107,18 @@ jobs:
     #     secrets: |
     #       db-connection-string
     
-    # - name: Azure SQL deploy-database
-    #   uses: azure/sql-action@v2.3
-    #   with:
-    #     server-name: testserver0002
-    #     connection-string: ${{ secrets.sqldbconnection}}
-    #      # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
-    #     path: .SQLDB/migration.sql
-    #     action: publish
-    #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
-    #     # dacpac-package: migration.sql
-    #     # script-file: ${{ github.workspace }}/myapp/migration.sql
+    - name: Azure SQL deploy-database
+      uses: azure/sql-action@v2.3
+      with:
+        # server-name: testserver0002
+        connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
+         # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
+        path: .SQLDB/migration.sql
+        action: publish
+        skip-firewall-check: true
+        # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
+        # dacpac-package: migration.sql
+        # script-file: ${{ github.workspace }}/myapp/migration.sql
 
     # - name: Deploy Functions
     #   uses: azure/functions-action@v1
