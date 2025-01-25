@@ -113,7 +113,7 @@ jobs:
         # server-name: testserver0002
         connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
          # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
-        path: .SQLDB/migration.sql
+        path: .APPX/migration.sql
         action: publish
         skip-firewall-check: true
         # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
