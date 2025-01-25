@@ -90,11 +90,11 @@ jobs:
         
     - uses: azure/login@v1
       with:
-       client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
-       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-       # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-       allow-no-subscriptions: true
-        # creds: ${{ secrets.AZURE_CREDENTIALS }}
+       # client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+       # tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+       # # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+       # allow-no-subscriptions: true
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # - name: Stop Azure Function App
     #   run: az functionapp stop --name tesfuncapp00 --resource-group tesfuncapp00_group   
@@ -131,26 +131,26 @@ jobs:
     # - name: start Azure Function App
     #   run: az functionapp start --name testfnc --resource-group testproject   
 
-  deploySqlscriptsonUat:
-    runs-on: runner2
-    needs: build
-    # environment: DEV
+  # deploySqlscriptsonUat:
+  #   runs-on: runner2
+  #   needs: build
+  #   # environment: DEV
 
-    steps:
-    - name: Download Build Artifacts
-      uses: actions/download-artifact@v3.0.0
-      with:
-        name: APPX
-        path: .APPX
+  #   steps:
+  #   - name: Download Build Artifacts
+  #     uses: actions/download-artifact@v3.0.0
+  #     with:
+  #       name: APPX
+  #       path: .APPX
         
-    - name: Install Azure CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash         
+  #   - name: Install Azure CLI
+  #     run: |
+  #       curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash         
         
-    - uses: azure/login@v1
-      with:
-       client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
-       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-       # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-       allow-no-subscriptions: true
-        # creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #   - uses: azure/login@v1
+  #     with:
+  #      client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+  #      tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+  #      # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #      allow-no-subscriptions: true
+  #       # creds: ${{ secrets.AZURE_CREDENTIALS }}
