@@ -111,7 +111,7 @@ jobs:
       uses: azure/sql-action@v2.3
       with:
         # server-name: testserver0002
-        connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Persist Security Info=False;User ID=testinguser@nairanil83gmail.onmicrosoft.com;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication="Active Directory Integrated";
+        connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Persist Security Info=False;User ID=testinguser@nairanil83gmail.onmicrosoft.com;Password=p@ssword@9594;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication="Active Directory Password";
          # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
         path: .APPX/migration.sql
         action: publish
