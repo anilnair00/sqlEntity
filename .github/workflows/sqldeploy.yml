@@ -18,7 +18,7 @@ permissions:
   
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: k8s-runners
 
     steps:
     - name: Checkout repository
@@ -73,7 +73,7 @@ jobs:
         path: ${{ github.workspace }}/sql/migration.sql
 
   deploySqlscriptsonDev:
-    runs-on: ubuntu-latest
+    runs-on: k8s-runners
     needs: build
     # environment: DEV
 
