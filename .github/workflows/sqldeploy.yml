@@ -60,11 +60,11 @@ jobs:
           export PATH="$PATH:/home/runner/.dotnet/tools"
           dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
           
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4.0.0
-      with:
-        name: APPX
-        path: ${{ github.workspace }}/myapp.zip
+    # - name: Upload Build Artifacts
+    #   uses: actions/upload-artifact@v4.0.0
+    #   with:
+    #     name: APPX
+    #     path: ${{ github.workspace }}/myapp.zip
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4.0.0
