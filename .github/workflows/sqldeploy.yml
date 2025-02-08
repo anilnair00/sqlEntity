@@ -61,13 +61,13 @@ jobs:
           dotnet ef migrations script --project AzAiIntegration.DataAccess --startup-project AzAiIntegration.Functions --context AppxDbContext -i --output ${{github.workspace}}/sql/migration.sql
           
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v4.0.0
       with:
         name: APPX
         path: ${{ github.workspace }}/myapp.zip
 
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v4..0.0
       with:
         name: APPX
         path: ${{ github.workspace }}/sql/migration.sql
@@ -79,7 +79,7 @@ jobs:
 
     steps:
     - name: Download Build Artifacts
-      uses: actions/download-artifact@v3.0.0
+      uses: actions/download-artifact@v4.0.0
       with:
         name: APPX
         path: .APPX
