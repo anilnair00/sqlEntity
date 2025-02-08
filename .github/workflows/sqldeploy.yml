@@ -88,13 +88,17 @@ jobs:
       run: |
         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash         
         
+    # - uses: azure/login@v1
+    #   with:
+    #    client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+    #    tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+    #    # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    #    allow-no-subscriptions: true
+    #     # creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     - uses: azure/login@v1
-      with:
-       client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
-       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-       # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-       allow-no-subscriptions: true
-        # creds: ${{ secrets.AZURE_CREDENTIALS }}
+      with: 
+         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # - name: Stop Azure Function App
     #   run: az functionapp stop --name tesfuncapp00 --resource-group tesfuncapp00_group   
