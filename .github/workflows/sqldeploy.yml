@@ -41,14 +41,12 @@ jobs:
     #   run: dotnet restore AirPassengerProtection.Integration.sln
       
     - name: Build .NET Projects
-      run: dotnet build ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG --no-restore
+      run: dotnet build ${{ secrets.SOLUTIONFILE }} --configuration $BUILD_CONFIG --no-restore
  
-    # - name: Run .NET Tests
-    #   run: dotnet test **/Tests.csproj --configuration $BUILD_CONFIG
 
     - name: Publish Functions
       run: |
-          dotnet publish AzAiIntegration.Functions/AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/functionapp
+          dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/functionapp
           
     - name: Zip Functions Artifact
       run: |
