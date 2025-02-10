@@ -93,11 +93,11 @@ jobs:
        # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
        allow-no-subscriptions: true
 
-    # - uses: azure/login@v2
-    #   with:
-    #     client-id: c179b16a-98a1-43ca-b2e9-d719b66c7fd0 # The Managed Identity with Federated Credential
-    #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-    #     subscription-id: ee902f6d-01a9-4a32-8c5f-af9403e6c766
+    - uses: azure/login@v2
+      with:
+        client-id: c179b16a-98a1-43ca-b2e9-d719b66c7fd0 # The Managed Identity with Federated Credential
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ee902f6d-01a9-4a32-8c5f-af9403e6c766
             
     #     # creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -120,7 +120,8 @@ jobs:
       uses: azure/sql-action@v2.3
       with:
         # server-name: testserver0002
-        connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
+        # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
+        connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
          # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
         path: .APPX/migration.sql
         action: publish
