@@ -137,7 +137,7 @@ jobs:
           connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
             # connection-string: ${{ steps.keyvault.outputs.connectionStrin }}
             # Path to the file used for this action. Supported file types are .sql, .dacpac, or .sqlproj.
-          path: .SQLDB/AdventureWorks2012.dacpac
+          path: .APPX/migration.sql
             # If not using a .sql file, the sqlpackage action to execute.
           action: publish
             # In case of .dacpac or .sqlproj file types, additional sqlpackage arguments that will be applied. In case of .sql file type, additional go-sqlcmd argument that will be applied.
