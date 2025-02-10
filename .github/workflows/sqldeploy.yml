@@ -91,7 +91,7 @@ jobs:
     - uses: azure/login@v1
       with:
        # client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
-       client-id:: c179b16a-98a1-43ca-b2e9-d719b66c7fd0
+       client-id: c179b16a-98a1-43ca-b2e9-d719b66c7fd0
        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
        # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
        allow-no-subscriptions: true
