@@ -139,7 +139,7 @@ jobs:
             # Path to the file used for this action. Supported file types are .sql, .dacpac, or .sqlproj.
           path: .APPX/migration.sql
             # If not using a .sql file, the sqlpackage action to execute.
-          action: publish
+          # action: publish
             # In case of .dacpac or .sqlproj file types, additional sqlpackage arguments that will be applied. In case of .sql file type, additional go-sqlcmd argument that will be applied.
             # arguments: # optional
             # # In case of a .sqlproj file, additional arguments that will be applied to dotnet build when building the database project.
