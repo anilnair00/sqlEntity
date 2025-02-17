@@ -116,34 +116,34 @@ jobs:
     #     secrets: |
     #       db-connection-string
     
-    # - name: Azure SQL deploy-database
-    #   uses: azure/sql-action@v2.3
-    #   with:
-    #     # server-name: testserver0002
-    #     connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="Active Directory Default";
-    #     # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
-    #      # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
-    #     path: .APPX/migration.sql
-    #     action: publish
-    #     skip-firewall-check: true
+    - name: Azure SQL deploy-database
+      uses: azure/sql-action@v2.3
+      with:
+        # server-name: testserver0002
+        connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="Active Directory Default";
+        # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
+         # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
+        path: .APPX/migration.sql
+        action: publish
+        skip-firewall-check: true
     #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
     #     # dacpac-package: migration.sql
     #     # script-file: ${{ github.workspace }}/myapp/migration.sql
 
-    - name: Azure SQL Deploy
-      uses: Azure/sql-action@v2.2.1
-      with:
-          # The connection string, including authentication information, for the Azure SQL Server database.
-          connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
-            # connection-string: ${{ steps.keyvault.outputs.connectionStrin }}
-            # Path to the file used for this action. Supported file types are .sql, .dacpac, or .sqlproj.
-          path: .APPX/migration.sql
-            # If not using a .sql file, the sqlpackage action to execute.
-          # action: publish
-            # In case of .dacpac or .sqlproj file types, additional sqlpackage arguments that will be applied. In case of .sql file type, additional go-sqlcmd argument that will be applied.
-            # arguments: # optional
-            # # In case of a .sqlproj file, additional arguments that will be applied to dotnet build when building the database project.
-            # build-arguments: # optional
+    # - name: Azure SQL Deploy
+    #   uses: Azure/sql-action@v2.2.1
+    #   with:
+    #       # The connection string, including authentication information, for the Azure SQL Server database.
+    #       connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
+    #         # connection-string: ${{ steps.keyvault.outputs.connectionStrin }}
+    #         # Path to the file used for this action. Supported file types are .sql, .dacpac, or .sqlproj.
+    #       path: .APPX/migration.sql
+    #         # If not using a .sql file, the sqlpackage action to execute.
+    #       # action: publish
+    #         # In case of .dacpac or .sqlproj file types, additional sqlpackage arguments that will be applied. In case of .sql file type, additional go-sqlcmd argument that will be applied.
+    #         # arguments: # optional
+    #         # # In case of a .sqlproj file, additional arguments that will be applied to dotnet build when building the database project.
+    #         # build-arguments: # optional
     # - name: Deploy Functions
     #   uses: azure/functions-action@v1
     #   id: fa
