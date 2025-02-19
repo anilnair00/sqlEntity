@@ -94,11 +94,11 @@ jobs:
        # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
        allow-no-subscriptions: true
 
-    - uses: azure/login@v2
-      with:
-        client-id: 544cec53-e791-49a1-a75b-7fa4fd9e6981 # The Managed Identity with Federated Credential
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ee902f6d-01a9-4a32-8c5f-af9403e6c766
+    # - uses: azure/login@v2
+    #   with:
+    #     client-id: 544cec53-e791-49a1-a75b-7fa4fd9e6981 # The Managed Identity with Federated Credential
+    #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+    #     subscription-id: ee902f6d-01a9-4a32-8c5f-af9403e6c766
             
     #     # creds: ${{ secrets.AZURE_CREDENTIALS }}
 
