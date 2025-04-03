@@ -74,6 +74,7 @@ jobs:
   deploySqlscriptsonDev:
     runs-on: ubuntu-latest
     needs: build
+    if: success() && startsWith(github.ref, 'refs/heads/release/rc')  
     environment: DEV
 
     steps:
