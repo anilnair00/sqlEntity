@@ -74,7 +74,7 @@ jobs:
   deploySqlscriptsonDev:
     runs-on: runner1
     needs: build
-    # environment: DEV
+    environment: DEV
 
     steps:
     - name: Download Build Artifacts
