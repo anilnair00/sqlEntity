@@ -44,7 +44,6 @@ jobs:
     - name: Build .NET Projects
       run: dotnet build ${{ secrets.SOLUTIONFILE }} --configuration $BUILD_CONFIG --no-restore
  
-
     - name: Publish Functions
       run: |
           dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/functionapp
