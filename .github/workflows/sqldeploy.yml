@@ -8,6 +8,7 @@ on:
     paths:
     - .github/workflows/sqldeploy.yml
     
+
 env:
   BUILD_CONFIG: 'Release'
   # DOTNET_ROOT: '/home/runner/.dotnet'
