@@ -94,6 +94,15 @@ jobs:
        # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
        allow-no-subscriptions: true
 ############################################################################
+
+    - name: Install .NET SDK
+      run: |
+        wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+        chmod +x dotnet-install.sh
+        ./dotnet-install.sh --channel 8.0 --install-dir "$HOME/dotnet"
+        echo "$HOME/dotnet" >> $GITHUB_PATH
+        echo "$HOME/dotnet/tools" >> $GITHUB_PATH
+    
     - name: Install sqlcmd v2 (cross-platform CLI)
       run: |
         dotnet tool install --global Microsoft.Data.SqlClient.SqlCmd
