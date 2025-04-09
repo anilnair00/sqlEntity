@@ -122,7 +122,7 @@ jobs:
       with:
         # server-name: testserver0002
         # connection-string: Server=tcp:sqlserver0001.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="Active Directory Default";
-         connection-string: Server=tcp:sqlserver0001.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="ActiveDirectoryServicePrincipal";
+        connection-string: Server=tcp:sqlserver0001.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="ActiveDirectoryServicePrincipal";
         # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
          # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
         path: .APPX/migration.sql
