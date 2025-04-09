@@ -94,27 +94,19 @@ jobs:
        # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
        allow-no-subscriptions: true
 ############################################################################
-    - name: Install sqlcmd (if not already available)
+    - name: Install sqlcmd v2 (cross-platform CLI)
       run: |
-        curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-        sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/20.04/prod.list)"
-        sudo apt-get update
-    
-        # Accept EULA during installation
-        sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools unixodbc-dev
-    
-        # Add sqlcmd to PATH
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.profile
-        source ~/.bashrc
+        dotnet tool install --global Microsoft.Data.SqlClient.SqlCmd
+        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-    - name: Deploy SQL script using Managed Identity
+    - name: Run SQL migration using Managed Identity
       run: |
-        /opt/mssql-tools/bin/sqlcmd -S testdbserver901.database.windows.net \
-          -d testdb \
-          --authentication-method=ActiveDirectoryManagedIdentity \
-          -G \
-          -i .APPX/migration.sql
+        sqlcmd -S testdbserver901.database.windows.net \
+               -d testdb \
+               --auth-type ActiveDirectoryManagedIdentity \
+               -G \
+               -i .APPX/migration.sql
+
 #################################################################################
     # - uses: azure/login@v2
     #   with:
