@@ -110,11 +110,11 @@ jobs:
 
     - name: Deploy SQL script using Managed Identity
       run: |
-        sqlcmd -S testdbserver901.database.windows.net \
-               -d testdb \
-               --authentication-method=ActiveDirectoryManagedIdentity \
-               -G \
-               -i .APPX/migration.sql
+        /opt/mssql-tools/bin/sqlcmd -S testdbserver901.database.windows.net \
+          -d testdb \
+          --authentication-method=ActiveDirectoryManagedIdentity \
+          -G \
+          -i .APPX/migration.sql
 #################################################################################
     # - uses: azure/login@v2
     #   with:
