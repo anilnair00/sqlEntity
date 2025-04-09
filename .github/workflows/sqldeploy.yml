@@ -93,30 +93,15 @@ jobs:
        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
        # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
        allow-no-subscriptions: true
-############################################################################
-
-    - name: Install .NET SDK
-      run: |
-        wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
-        chmod +x dotnet-install.sh
-        ./dotnet-install.sh --channel 8.0 --install-dir "$HOME/dotnet"
-        echo "$HOME/dotnet" >> $GITHUB_PATH
-        echo "$HOME/dotnet/tools" >> $GITHUB_PATH
     
-    - name: Install sqlcmd v2 (cross-platform CLI)
-      run: |
-        dotnet tool install --global Microsoft.Data.SqlClient.SqlCmd
-        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-
-    - name: Run SQL migration using Managed Identity
-      run: |
-        sqlcmd -S testdbserver901.database.windows.net \
-               -d testdb \
-               --auth-type ActiveDirectoryManagedIdentity \
-               -G \
-               -i .APPX/migration.sql
-
-#################################################################################
+    - uses: azure/login@v2
+      with:
+       # client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+       client-id: 1818ea79-198b-413b-9aff-a4d66742a9df
+       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+       # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+       allow-no-subscriptions: true
+       
     # - uses: azure/login@v2
     #   with:
     #     client-id: 544cec53-e791-49a1-a75b-7fa4fd9e6981 # The Managed Identity with Federated Credential
