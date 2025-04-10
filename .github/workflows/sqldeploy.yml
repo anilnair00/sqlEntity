@@ -135,10 +135,10 @@ jobs:
         path: .APPX/migration.sql
         action: publish
         skip-firewall-check: true
-      env:
-         AZURE_CLIENT_ID: 084f318f-40aa-4d40-93ea-5ed3472b66bc
-         AZURE_TENANT_ID: abec7981-3822-4685-98b0-533aca20c2ed
-         AZURE_CLIENT_SECRET: JS78Q~mXGGtnoyC5w.go7VbWK1rXt4K7u-I9Cc93
+      # env:
+      #    AZURE_CLIENT_ID: 084f318f-40aa-4d40-93ea-5ed3472b66bc
+      #    AZURE_TENANT_ID: abec7981-3822-4685-98b0-533aca20c2ed
+      #    AZURE_CLIENT_SECRET: JS78Q~mXGGtnoyC5w.go7VbWK1rXt4K7u-I9Cc93
     #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
     #     # dacpac-package: migration.sql
     #     # script-file: ${{ github.workspace }}/myapp/migration.sql
