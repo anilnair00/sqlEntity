@@ -129,11 +129,15 @@ jobs:
       uses: azure/sql-action@v2.3
       with:
         # server-name: testserver0002
-        connection-string: Server=tcp:sqlserver0001.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="Active Directory Default";        # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
+        connection-string: Server=tcp:testserver0012.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="Active Directory Default";        # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
          # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
         path: .APPX/migration.sql
         action: publish
         skip-firewall-check: true
+      env:
+         AZURE_CLIENT_ID: 0eb73ea4-3450-4526-b149-041593c36929
+         AZURE_TENANT_ID: abec7981-3822-4685-98b0-533aca20c2ed
+         AZURE_CLIENT_SECRET: JS78Q~mXGGtnoyC5w.go7VbWK1rXt4K7u-I9Cc93
     #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
     #     # dacpac-package: migration.sql
     #     # script-file: ${{ github.workspace }}/myapp/migration.sql
