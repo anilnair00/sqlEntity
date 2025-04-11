@@ -7,8 +7,8 @@ on:
       - release/rc-*
       - master
   schedule:
-   - cron: '45 6 * * *'  # 10:40 AM IST
-   # - cron: '30 5 * * *'  # 5:30 AM UTC daily
+   - cron: '00 6 * * *'  # 10:40 AM IST
+   - cron: '30 5 * * *'  # 5:30 AM UTC daily
     # paths:
     # - .github/workflows/sqldeploy.yml
     
@@ -75,7 +75,7 @@ jobs:
         path: ${{ github.workspace }}/sql/migration.sql
 
   deploySqlscriptsonDev:
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: build
     environment: DEV
