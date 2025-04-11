@@ -7,7 +7,7 @@ on:
       - release/rc-*
       - master
   schedule:
-   - cron: "10 5 * * *"  # 10:40 AM IST
+   - cron: '16 5 * * *'  # 10:40 AM IST
    # - cron: '30 5 * * *'  # 5:30 AM UTC daily
     # paths:
     # - .github/workflows/sqldeploy.yml
