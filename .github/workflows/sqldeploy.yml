@@ -8,7 +8,7 @@ on:
       - master
   schedule:
    - cron: '05 7 * * *'  # 10:40 AM IST
-   - cron: '30 5 * * *'  # 5:30 AM UTC daily
+   # - cron: '30 5 * * *'  # 5:30 AM UTC daily
     # paths:
     # - .github/workflows/sqldeploy.yml
     
