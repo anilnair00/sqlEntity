@@ -50,12 +50,12 @@ jobs:
  
     - name: Publish Functions
       run: |
-          dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/functions
+          dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/temp/functions
           
     - name: Zip Functions Artifact
       run: |
           mkdir -p ${{ github.workspace }}/APPX/Functions
-          cd ${{ github.workspace }}/functions
+          cd ${{ github.workspace }}/temp/functions
           zip -r ${{ github.workspace }}/APPX/Functions/functions.zip .
           # zip -r ../myapp.zip .
 
