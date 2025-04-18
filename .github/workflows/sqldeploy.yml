@@ -50,17 +50,19 @@ jobs:
  
     - name: Publish Functions
       run: |
-          dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/functionapp
+          dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/functions
           
     - name: Zip Functions Artifact
       run: |
-          cd ${{ github.workspace }}/functionapp
-          zip -r ../myapp.zip .
+          mkdir -p ${{ github.workspace }}/APPX/Functions
+          cd ${{ github.workspace }}/functions
+          zip -r ${{ github.workspace }}/APPX/Functions/functions.zip .
+          # zip -r ../myapp.zip .
 
     - name: Create EF Core migration script ()
       run: |
           export PATH="$PATH:/home/runner/.dotnet/tools"
-          dotnet ef migrations script --project ${{ secrets.PUBLISHFUNCTIONS }} --startup-project ${{ secrets.STARTUP }} --context ${{ secrets.CONTEXT }} -i --output ${{github.workspace}}/sql/migration.sql
+          dotnet ef migrations script --project ${{ secrets.PUBLISHFUNCTIONS }} --startup-project ${{ secrets.STARTUP }} --context ${{ secrets.CONTEXT }} -i --output ${{github.workspace}}/APPX/migration.sql
           
     # - name: Upload Build Artifacts
     #   uses: actions/upload-artifact@v4.0.0
@@ -68,11 +70,17 @@ jobs:
     #     name: APPX
     #     path: ${{ github.workspace }}/myapp.zip
 
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4.0.0
+    - name: Upload Combined APPX Artifact
+      uses: actions/upload-artifact@v4
       with:
         name: APPX
-        path: ${{ github.workspace }}/sql/migration.sql
+        path: ${{ github.workspace }}/APPX
+    
+    # - name: Upload Build Artifacts
+    #   uses: actions/upload-artifact@v4.0.0
+    #   with:
+    #     name: APPX
+    #     path: ${{ github.workspace }}/sql/migration.sql
 
   deploySqlscriptsonDev:
     # if: github.event_name == 'schedule'
