@@ -110,7 +110,8 @@ jobs:
         sudo apt-get update
         sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
         echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-        source ~/.bashrc
+        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.profile
+        export PATH="$PATH:/opt/mssql-tools/bin"
 
     - name: Get Azure AD Access Token
       id: get-token
@@ -120,6 +121,7 @@ jobs:
 
     - name: Execute SQL script using Azure AD auth
       run: |
+        export PATH="$PATH:/opt/mssql-tools/bin"
         sqlcmd -S testserver0034.database.windows.net \
                -d testdb \
                -G -i ".APPX/migration.sql"
