@@ -128,16 +128,19 @@ jobs:
         echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
 
     - name: Run SQL script with sqlcmd using OAuth token
-      # env:
-      #     SQLCMDACCESSTOKEN: ${{ env.ACCESS_TOKEN }}
+      env:
+          SQLCMDACCESSTOKEN: ${{ env.ACCESS_TOKEN }}
       run: |
         export PATH="$PATH:/opt/mssql-tools/bin"
         export SQLCMDACCESSTOKEN="$ACCESS_TOKEN"
     
-        sqlcmd -S testserver0034.database.windows.net \
-               -d testdb \
-               -G -i ".APPX/migration.sql"
-
+        # sqlcmd -S testserver0034.database.windows.net \
+        #        -d testdb \
+        #        -G -i ".APPX/migration.sql"
+          sqlcmd -S testserver0034.database.windows.net \
+                 -d testdb \
+                 -G \
+                 -i ./SQLDB/migration.sql
 
 #####################################################
   deploySqlscriptsonUAT:
