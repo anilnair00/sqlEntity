@@ -132,7 +132,7 @@ jobs:
           /SourceFile:".APPX/migration.sql" \
           /TargetServerName:"testserver0034.database.windows.net" \
           /TargetDatabaseName:"testdb" \
-          /AccessToken:"$ACCESS_TOKEN
+          /AccessToken:"$ACCESS_TOKEN"
           
     - name: Run SQL script with sqlcmd using OAuth token
       env:
