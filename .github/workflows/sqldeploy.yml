@@ -102,30 +102,27 @@ jobs:
        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
        # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
        allow-no-subscriptions: true
-       
-    - name: Install SQLCMD CLI tools
-      run: |
-        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
-        sudo apt-get update
-        sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.profile
-        export PATH="$PATH:/opt/mssql-tools/bin"
 
+    - name: Install latest sqlcmd v2
+      shell: pwsh
+      run: |
+        Invoke-WebRequest -Uri https://aka.ms/sqlcmd-win -OutFile sqlcmd.msi
+        Start-Process msiexec.exe -Wait -ArgumentList '/i sqlcmd.msi /quiet'
+    
     - name: Get Azure AD Access Token
-      id: get-token
+      shell: pwsh
       run: |
-        ACCESS_TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
-        echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+        $token = az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv
+        echo "##vso[task.setvariable variable=ACCESS_TOKEN]$token"
 
-    - name: Execute SQL script using Azure AD auth
+    - name: Run SQL script with sqlcmd + Azure AD token
+      shell: pwsh
       run: |
-        export PATH="$PATH:/opt/mssql-tools/bin"
-        export SQLCMDACCESSTOKEN=$ACCESS_TOKEN
-        sqlcmd -S testserver0034.database.windows.net \
-               -d testdb \
-               -G -i ".APPX/migration.sql"
+        $env:SQLCMDACCESSTOKEN = "${{ env.ACCESS_TOKEN }}"
+        sqlcmd -S "${{ secrets.SQL_SERVER_NAME }}.database.windows.net" `
+               -d "${{ secrets.SQL_DATABASE_NAME }}" `
+               -G -i ".\APPX\migration.sql"
+
 #####################################################
   deploySqlscriptsonUAT:
     if: success() && github.ref == 'refs/heads/release'
