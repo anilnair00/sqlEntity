@@ -103,26 +103,29 @@ jobs:
        # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
        allow-no-subscriptions: true
 
-    - name: Install latest sqlcmd v2
-      shell: pwsh
+    - name: Install sqlcmd tools
       run: |
-        Invoke-WebRequest -Uri https://aka.ms/sqlcmd-win -OutFile sqlcmd.msi
-        Start-Process msiexec.exe -Wait -ArgumentList '/i sqlcmd.msi /quiet'
-    
-    - name: Get Azure AD Access Token
-      shell: pwsh
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+          sudo ACCEPT_EULA=Y apt-get install -y mssql-tools18
+          echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+          source ~/.bashrc
+          
+    - name: Get Azure AD access token for SQL
+      id: gettoken
       run: |
-        $token = az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv
-        echo "::add-mask::$token"
-        echo "ACCESS_TOKEN=$token" >> $env:GITHUB_ENV
-        
-    - name: Run SQL script with sqlcmd + Azure AD token
-      shell: pwsh
+          ACCESS_TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
+          echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+
+    - name: Run SQL script with sqlcmd using OAuth token
+      env:
+          SQLCMDACCESSTOKEN: ${{ env.ACCESS_TOKEN }}
       run: |
-        $env:SQLCMDACCESSTOKEN = "${{ env.ACCESS_TOKEN }}"
-        sqlcmd -S "testserver0034.database.windows.net" `
-               -d "testdb" `
-               -G -i ".APPX\migration.sql"
+          sqlcmd -S testserver0034.database.windows.net -d testdb -G -i ./SQLDB/migration.sql
+
+
 
 #####################################################
   deploySqlscriptsonUAT:
