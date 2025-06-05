@@ -121,7 +121,7 @@ jobs:
         $env:SQLCMDACCESSTOKEN = "${{ env.ACCESS_TOKEN }}"
         sqlcmd -S "testserver0034.database.windows.net" `
                -d "testdb" `
-               -G -i ".\APPX\migration.sql"
+               -G -i ".APPX\migration.sql"
 
 #####################################################
   deploySqlscriptsonUAT:
