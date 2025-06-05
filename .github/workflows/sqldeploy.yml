@@ -122,6 +122,7 @@ jobs:
     - name: Execute SQL script using Azure AD auth
       run: |
         export PATH="$PATH:/opt/mssql-tools/bin"
+        export SQLCMDACCESSTOKEN=$ACCESS_TOKEN
         sqlcmd -S testserver0034.database.windows.net \
                -d testdb \
                -G -i ".APPX/migration.sql"
