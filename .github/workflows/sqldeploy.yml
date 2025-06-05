@@ -95,7 +95,27 @@ jobs:
       with:
         name: APPX
         path: .APPX
+        
+    - name: Install SQLCMD CLI tools
+      run: |
+        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+        sudo apt-get update
+        sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
+        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+        source ~/.bashrc
 
+    - name: Get Azure AD Access Token
+      id: get-token
+      run: |
+        ACCESS_TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
+        echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+
+    - name: Execute SQL script using Azure AD auth
+      run: |
+        sqlcmd -S testserver0034.database.windows.net \
+               -d testdb \
+               -G -i ".APPX/migration.sql"
 #####################################################
   deploySqlscriptsonUAT:
     if: success() && github.ref == 'refs/heads/release'
@@ -152,37 +172,15 @@ jobs:
     #     secrets: |
     #       db-connection-string
 
-    - name: Install SQLCMD CLI tools
-      run: |
-        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
-        sudo apt-get update
-        sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-        source ~/.bashrc
-
-    - name: Get Azure AD Access Token
-      id: get-token
-      run: |
-        ACCESS_TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
-        echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
-
-    - name: Execute SQL script using Azure AD auth
-      run: |
-        sqlcmd -S testserver0034.database.windows.net \
-               -d testdb \
-               -G -i ".APPX/migration.sql"
-##################################################################################################################################################
-#################################################################################################################################################
-    # - name: Azure SQL deploy-database
-    #   uses: azure/sql-action@v2.3
-    #   with:
-    #     # server-name: testserver0002
-    #     connection-string: Server=tcp:testserver0012.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="Active Directory Default";        # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
-    #      # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
-    #     path: .APPX/migration.sql
-    #     action: publish
-    #     skip-firewall-check: true
+    - name: Azure SQL deploy-database
+      uses: azure/sql-action@v2.3
+      with:
+        # server-name: testserver0002
+        connection-string: Server=tcp:testserver0012.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="Active Directory Default";        # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
+         # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
+        path: .APPX/migration.sql
+        action: publish
+        skip-firewall-check: true
         
       # env:
       #    AZURE_CLIENT_ID: 084f318f-40aa-4d40-93ea-5ed3472b66bc
