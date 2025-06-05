@@ -124,9 +124,13 @@ jobs:
         export PATH="$PATH:/opt/mssql-tools/bin"
     
     - name: Get Azure AD Token for SQL
+      env:
+          SQLCMDACCESSTOKEN: ${{ env.ACCESS_TOKEN }}
       run: |
         ACCESS_TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
         echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+        export PATH="$PATH:/opt/mssql-tools/bin"
+        export SQLCMDACCESSTOKEN="$ACCESS_TOKEN"
 
           sqlcmd /Action:Publish \
           /SourceFile:".APPX/migration.sql" \
@@ -134,12 +138,12 @@ jobs:
           /TargetDatabaseName:"testdb" \
           /AccessToken:"$ACCESS_TOKEN"
           
-    - name: Run SQL script with sqlcmd using OAuth token
-      env:
-          SQLCMDACCESSTOKEN: ${{ env.ACCESS_TOKEN }}
-      run: |
-        export PATH="$PATH:/opt/mssql-tools/bin"
-        export SQLCMDACCESSTOKEN="$ACCESS_TOKEN"
+    # - name: Run SQL script with sqlcmd using OAuth token
+    #   env:
+    #       SQLCMDACCESSTOKEN: ${{ env.ACCESS_TOKEN }}
+    #   run: |
+    #     export PATH="$PATH:/opt/mssql-tools/bin"
+    #     export SQLCMDACCESSTOKEN="$ACCESS_TOKEN"
     
         # sqlcmd -S testserver0034.database.windows.net \
         #        -d testdb \
