@@ -113,8 +113,9 @@ jobs:
       shell: pwsh
       run: |
         $token = az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv
-        echo "##vso[task.setvariable variable=ACCESS_TOKEN]$token"
-
+        echo "::add-mask::$token"
+        echo "ACCESS_TOKEN=$token" >> $env:GITHUB_ENV
+        
     - name: Run SQL script with sqlcmd + Azure AD token
       shell: pwsh
       run: |
