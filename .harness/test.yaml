@@ -6,3 +6,4 @@ service:
   serviceDefinition:
     spec: {}
     type: Kubernetes
+    
