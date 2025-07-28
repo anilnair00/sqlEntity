@@ -1,5 +1,4 @@
 name: SIT
-
 on:
   pull_request:
     branches:
