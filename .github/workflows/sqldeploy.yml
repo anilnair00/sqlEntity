@@ -6,6 +6,7 @@ on:
       - master
       - release/rc-*
       # - master
+
       
   # schedule:
   #  # - cron: '10 15 * * *'  # 10:40 AM IST
