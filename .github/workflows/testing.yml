@@ -3,8 +3,8 @@ on:
   pull_request:
     branches:
       - develop
-      - release
-      - master
+      # - release
+      # - master
 
 env:
   BUILD_CONFIG: 'Release'
