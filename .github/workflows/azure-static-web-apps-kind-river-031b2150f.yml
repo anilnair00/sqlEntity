@@ -1,13 +1,13 @@
 name: Azure Static Web Apps CI/CD
 
 on:
-#   push:
-#     branches:
-#       - master
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
+  push:
     branches:
-      - master
+      - master1
+  # pull_request:
+  #   types: [opened, synchronize, reopened, closed]
+  #   branches:
+  #     - master
 
 jobs:
   build_and_deploy_job:
@@ -44,3 +44,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_KIND_RIVER_031B2150F }}
           action: "close"
+
