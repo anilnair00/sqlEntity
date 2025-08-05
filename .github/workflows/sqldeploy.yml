@@ -6,8 +6,8 @@ on:
       - feature/*
       - master
       - release/rc-*
-    paths: 
-      - "**/*"
+    # paths: 
+    #   - "**/*"
       # - master
 
       
