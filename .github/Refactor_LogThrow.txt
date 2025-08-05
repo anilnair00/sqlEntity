@@ -5,3 +5,4 @@ Add a using statement for the LoggerExtensions type outside of the namespace.
 
 
 
+
