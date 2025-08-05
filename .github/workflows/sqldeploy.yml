@@ -3,10 +3,9 @@ on:
   # push:
   pull_request: 
     branches:
-      - develop
+      - master
       - release/rc-*
-      # - master
-      
+      # - master      
   # schedule:
   #  # - cron: '10 15 * * *'  # 10:40 AM IST
   #  # - cron: '30 5 * * *'  # 5:30 AM UTC daily
