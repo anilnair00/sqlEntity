@@ -1,5 +1,4 @@
 name: .NET Core CI with Unit Tests
-
 on:
   pull_request:
     branches:
