@@ -91,7 +91,7 @@ jobs:
     # if: github.event_name == 'schedule' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: build
-    # environment: DEV
+    environment: DEV
 
     steps:
     - name: Download Build Artifacts
@@ -100,12 +100,12 @@ jobs:
         name: APPX
         path: .APPX
 
-    - uses: azure/login@v1
-      with:
-       client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
-       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-       # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-       allow-no-subscriptions: true
+    # - uses: azure/login@v1
+    #   with:
+    #    client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+    #    tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+    #    # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    #    allow-no-subscriptions: true
     
     # - name: Install sqlcmd tools
     #   run: |
@@ -117,32 +117,32 @@ jobs:
     #     echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.profile
     #     export PATH="$PATH:/opt/mssql-tools18/bin"
 
-    - name: Install sqlcmd
-      run: |
-        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
-        sudo apt-get update
-        sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-        echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.profile
-        export PATH="$PATH:/opt/mssql-tools/bin"
+    # - name: Install sqlcmd
+    #   run: |
+    #     curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+    #     curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+    #     sudo apt-get update
+    #     sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
+    #     echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+    #     echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.profile
+    #     export PATH="$PATH:/opt/mssql-tools/bin"
 
-    - name: Get Azure AD access token for SQL DB
-      id: get_token
-      run: |
-          ACCESS_TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
-          echo "SQLCMDACCESSTOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+    # - name: Get Azure AD access token for SQL DB
+    #   id: get_token
+    #   run: |
+    #       ACCESS_TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
+    #       echo "SQLCMDACCESSTOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
 
-    - name: Run SQL script with sqlcmd
-      env:
-          SQLCMDACCESSTOKEN: ${{ env.SQLCMDACCESSTOKEN }}
-      run: |
-          export PATH="$PATH:/opt/mssql-tools/bin"
-          export SQLCMDACCESSTOKEN="$ACCESS_TOKEN"
-          sqlcmd -S testserver0034.database.windows.net \
-                 -d testdb \
-                 -G \
-                 -i .APPX/migration.sql
+    # - name: Run SQL script with sqlcmd
+    #   env:
+    #       SQLCMDACCESSTOKEN: ${{ env.SQLCMDACCESSTOKEN }}
+    #   run: |
+    #       export PATH="$PATH:/opt/mssql-tools/bin"
+    #       export SQLCMDACCESSTOKEN="$ACCESS_TOKEN"
+    #       sqlcmd -S testserver0034.database.windows.net \
+    #              -d testdb \
+    #              -G \
+    #              -i .APPX/migration.sql
         
     # - name: Run SQL script with sqlcmd using OAuth token
     #   env:
