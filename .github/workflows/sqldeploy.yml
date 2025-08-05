@@ -3,6 +3,7 @@ on:
   push:
   # pull_request: 
     branches:
+      - feature/*
       - master
       - release/rc-*
     paths: 
