@@ -1,4 +1,5 @@
 name: SQL ENTITY DEPLOY
+
 on:
   push:
   # pull_request: 
