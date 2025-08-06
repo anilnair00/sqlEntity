@@ -3,5 +3,3 @@ Make sure to pass the exception object as a parameter.
 Add a using statement for the LoggerExtensions type outside of the namespace.
 
 
-
-
