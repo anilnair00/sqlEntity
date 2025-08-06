@@ -1,8 +1,0 @@
-environment:
-  name: dev
-  identifier: dev
-  description: ""
-  tags: {}
-  type: PreProduction
-  orgIdentifier: default
-  projectIdentifier: default_project
