@@ -1,9 +1,0 @@
-service:
-  name: testsvc
-  identifier: testsvc
-  orgIdentifier: default
-  projectIdentifier: default_project
-  serviceDefinition:
-    spec: {}
-    type: Kubernetes
-    
