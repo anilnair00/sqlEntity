@@ -1,4 +1,4 @@
-name: SQL ENTITY DEPLOY
+name: Rollback pipeline
 
 on:
   push:
