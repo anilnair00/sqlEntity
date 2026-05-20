@@ -145,3 +145,64 @@ jobs:
         with:
           ref: ${{ github.event.inputs.rollback_tag }}
           fetch-depth: 0
+
+      - name: Set up .NET Core SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ secrets.DOTNETVERSION }}
+
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      - name: Build .NET Projects
+        run: dotnet build ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG --no-restore
+
+      - name: Publish Functions from rollback tag
+        run: |
+          cd AzAiIntegration.Functions
+          dotnet publish AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG --no-build --output ${{ github.workspace }}/temp/functions
+
+      - name: Zip Functions Artifact
+        run: |
+          mkdir -p ${{ github.workspace }}/APPX/Functions
+          cd ${{ github.workspace }}/temp/functions
+          zip -r ${{ github.workspace }}/APPX/Functions/functions.zip .
+
+      - name: Install Azure CLI
+        run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+      - name: Login to Azure Subscription
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.PRD_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Disable blob and service bus triggers
+        run: |
+          az functionapp config appsettings set \
+            --name ${{ secrets.PRD_FUNCAPP_NAME }} \
+            --resource-group ${{ secrets.PRD_RG_NAME }} \
+            --settings AzureWebJobs.AiReceiptReaderRequestHandler.Disabled=true AzureWebJobs.AiReceiptReaderResponseHandler.Disabled=true
+
+      - name: Wait for 20 seconds
+        run: sleep 20
+
+      - name: Stop Azure Function App
+        run: az functionapp stop --name ${{ secrets.PRD_FUNCAPP_NAME }} --resource-group ${{ secrets.PRD_RG_NAME }}
+
+      - name: Deploy rollback package
+        uses: Azure/functions-action@v1.5.3
+        with:
+          app-name: ${{ secrets.PRD_FUNCAPP_NAME }}
+          package: ${{ github.workspace }}/APPX/Functions/functions.zip
+
+      - name: Start Azure Function App
+        run: az functionapp start --name ${{ secrets.PRD_FUNCAPP_NAME }} --resource-group ${{ secrets.PRD_RG_NAME }}
+
+      - name: Re-enable blob and service bus triggers
+        run: |
+          az functionapp config appsettings set \
+            --name ${{ secrets.PRD_FUNCAPP_NAME }} \
+            --resource-group ${{ secrets.PRD_RG_NAME }} \
+            --settings AzureWebJobs.AiReceiptReaderRequestHandler.Disabled=false AzureWebJobs.AiReceiptReaderResponseHandler.Disabled=false
