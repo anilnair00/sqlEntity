@@ -1,0 +1,308 @@
+name: SQL ENTITY DEPLOY
+
+on:
+  push:
+  # pull_request: 
+    branches:
+      # - feature/*
+      - master
+      - release/rc-*
+    paths:
+      - "**/*"
+      - .github/workflows/rollback.yaml
+      
+  workflow_dispatch:
+        inputs:
+         mode:
+            description: "deploy or rollback"
+            required: true
+            type: choice
+            default: deploy
+            options:
+              - deploy
+              - rollback
+         rollback_tag:
+            description: "Git tag to rollback in PROD (example: v1.2.3)"
+            required: false
+            type: string
+    # paths: 
+    #   - "**/*"
+      # - master
+
+      
+  # schedule:
+  #  # - cron: '10 15 * * *'  # 10:40 AM IST
+  #  # - cron: '30 5 * * *'  # 5:30 AM UTC daily
+  #  - cron: '30 14 * * *'  # 5:30 AM UTC daily
+  # paths:
+  #      - .github/workflows/sqldeploy.yml
+    
+env:
+  BUILD_CONFIG: 'Release'
+  # DOTNET_ROOT: '/home/runner/.dotnet'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up .NET Core SDK
+      uses: actions/setup-dotnet@v2
+      with: 
+        dotnet-version: '8.0'
+        
+    - name: Install Entity Framework CLI
+      run: |
+          dotnet tool install --global dotnet-ef
+          export PATH="$PATH:/home/runner/.dotnet/tools"        
+                  
+    - name: Restore NuGet packages
+      run: dotnet restore 
+      
+    # - name: Restore NuGet packages
+    #   run: dotnet restore AirPassengerProtection.Integration.sln
+      
+    - name: Build .NET Projects
+      run: dotnet build ${{ secrets.SOLUTIONFILE }} --configuration $BUILD_CONFIG --no-restore
+ 
+    - name: Publish Functions
+      run: |
+          dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/temp/functions
+          
+    - name: Zip Functions Artifact
+      run: |
+          mkdir -p ${{ github.workspace }}/APPX/Functions
+          cd ${{ github.workspace }}/temp/functions
+          zip -r ${{ github.workspace }}/APPX/Functions/functions.zip .
+          # zip -r ../myapp.zip .
+
+    - name: Create EF Core migration script ()
+      run: |
+          export PATH="$PATH:/home/runner/.dotnet/tools"
+          dotnet ef migrations script --project ${{ secrets.PUBLISHFUNCTIONS }} --startup-project ${{ secrets.STARTUP }} --context ${{ secrets.CONTEXT }} -i --output ${{github.workspace}}/APPX/migration.sql
+          
+    # - name: Upload Build Artifacts
+    #   uses: actions/upload-artifact@v4.0.0
+    #   with:
+    #     name: APPX
+    #     path: ${{ github.workspace }}/myapp.zip
+
+    - name: Upload Combined APPX Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: APPX
+        path: ${{ github.workspace }}/APPX
+    
+    # - name: Upload Build Artifacts
+    #   uses: actions/upload-artifact@v4.0.0
+    #   with:
+    #     name: APPX
+    #     path: ${{ github.workspace }}/sql/migration.sql
+
+  deploySqlscriptsonDev:
+    # if: github.event_name == 'schedule'
+    # if: success() && github.base_ref == 'master'
+    # if:  github.ref == 'master' || startsWith(github.ref, 'refs/heads/feature/')
+    # if:  github.base_ref == 'master'
+    if:  github.ref == 'refs/heads/master'
+    # if: github.event_name == 'schedule' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: build
+    # environment: DEV
+
+    steps:
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4.0.0
+      with:
+        name: APPX
+        path: .APPX
+
+    # - uses: azure/login@v1
+    #   with:
+    #    client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+    #    tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+    #    # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    #    allow-no-subscriptions: true
+    
+    # - name: Install sqlcmd tools
+    #   run: |
+    #     curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+    #     curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+    #     sudo apt-get update
+    #     sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18 unixodbc-dev
+    #     echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+    #     echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.profile
+    #     export PATH="$PATH:/opt/mssql-tools18/bin"
+
+    # - name: Install sqlcmd
+    #   run: |
+    #     curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+    #     curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+    #     sudo apt-get update
+    #     sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
+    #     echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+    #     echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.profile
+    #     export PATH="$PATH:/opt/mssql-tools/bin"
+
+    # - name: Get Azure AD access token for SQL DB
+    #   id: get_token
+    #   run: |
+    #       ACCESS_TOKEN=$(az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv)
+    #       echo "SQLCMDACCESSTOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+
+    # - name: Run SQL script with sqlcmd
+    #   env:
+    #       SQLCMDACCESSTOKEN: ${{ env.SQLCMDACCESSTOKEN }}
+    #   run: |
+    #       export PATH="$PATH:/opt/mssql-tools/bin"
+    #       export SQLCMDACCESSTOKEN="$ACCESS_TOKEN"
+    #       sqlcmd -S testserver0034.database.windows.net \
+    #              -d testdb \
+    #              -G \
+    #              -i .APPX/migration.sql
+        
+    # - name: Run SQL script with sqlcmd using OAuth token
+    #   env:
+    #       SQLCMDACCESSTOKEN: ${{ env.ACCESS_TOKEN }}
+    #   run: |
+    #     export PATH="$PATH:/opt/mssql-tools/bin"
+    #     export SQLCMDACCESSTOKEN="$ACCESS_TOKEN"
+    
+        # sqlcmd -S testserver0034.database.windows.net \
+        #        -d testdb \
+        #        -G -i ".APPX/migration.sql"
+          # sqlcmd -S testserver0034.database.windows.net \
+          #        -d testdb \
+          #        -G \
+          #        -i .APPX/migration.sql
+
+#####################################################
+  deploySqlscriptsonUAT:
+    # if: success() && github.ref == 'refs/heads/release'
+    if: startsWith(github.base_ref, 'release/rc-') 
+    runs-on: ubuntu-latest
+    needs: build
+    environment: UAT
+    steps:
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4.0.0
+      with:
+        name: APPX
+        path: .APPX
+##########################################################
+    # - name: Install Azure CLI
+    #   run: |
+    #     curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash         
+        
+    - uses: azure/login@v1
+      with:
+       client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+       # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+       allow-no-subscriptions: true
+    
+    # - uses: azure/login@v2
+    #   with:
+    #    # client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+    #    client-id: 1818ea79-198b-413b-9aff-a4d66742a9df
+    #    tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+    #    # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    #    allow-no-subscriptions: true
+       
+    # - uses: azure/login@v2
+    #   with:
+    #     client-id: 544cec53-e791-49a1-a75b-7fa4fd9e6981 # The Managed Identity with Federated Credential
+    #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+    #     subscription-id: ee902f6d-01a9-4a32-8c5f-af9403e6c766
+            
+    #     # creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # - uses: azure/login@v1
+    #   with: 
+    #      creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # - name: Stop Azure Function App
+    #   run: az functionapp stop --name tesfuncapp00 --resource-group tesfuncapp00_group   
+
+    # - name: Fetch Secrets from Azure key Vault
+    #   id: keyvault
+    #   uses: azure/get-keyvault-secrets@v1
+    #   with:
+    #     keyvault: ${{ secrets.KEYVAULT_NAME }}
+    #     secrets: |
+    #       db-connection-string
+
+    - name: Azure SQL deploy-database
+      uses: azure/sql-action@v2.3
+      with:
+        # server-name: testserver0002
+        connection-string: Server=tcp:testserver0012.database.windows.net,1433;Initial Catalog=testdb;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;Authentication="Active Directory Default";        # connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Authentication=Active Directory Managed Identity;
+         # connection-string: ${{ steps.keyvault.outputs.db-connection-string }}
+        path: .APPX/migration.sql
+        action: publish
+        skip-firewall-check: true
+        
+      # env:
+      #    AZURE_CLIENT_ID: 084f318f-40aa-4d40-93ea-5ed3472b66bc
+      #    AZURE_TENANT_ID: abec7981-3822-4685-98b0-533aca20c2ed
+      #    AZURE_CLIENT_SECRET: JS78Q~mXGGtnoyC5w.go7VbWK1rXt4K7u-I9Cc93
+    #     # dacpac-package: ${{ github.workspace }}/myapp/migration.sql
+    #     # dacpac-package: migration.sql
+    #     # script-file: ${{ github.workspace }}/myapp/migration.sql
+
+    # - name: Azure SQL Deploy
+    #   uses: Azure/sql-action@v2.2.1
+    #   with:
+    #       # The connection string, including authentication information, for the Azure SQL Server database.
+    #       connection-string: Server=tcp:testdbserver901.database.windows.net,1433;Initial Catalog=testdb;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication="Active Directory Default";
+    #         # connection-string: ${{ steps.keyvault.outputs.connectionStrin }}
+    #         # Path to the file used for this action. Supported file types are .sql, .dacpac, or .sqlproj.
+    #       path: .APPX/migration.sql
+    #         # If not using a .sql file, the sqlpackage action to execute.
+    #       # action: publish
+    #         # In case of .dacpac or .sqlproj file types, additional sqlpackage arguments that will be applied. In case of .sql file type, additional go-sqlcmd argument that will be applied.
+    #         # arguments: # optional
+    #         # # In case of a .sqlproj file, additional arguments that will be applied to dotnet build when building the database project.
+    #         # build-arguments: # optional
+    # - name: Deploy Functions
+    #   uses: azure/functions-action@v1
+    #   id: fa
+    #   with:
+    #     app-name: testfnc
+    #     package: .APPX/myapp.zip
+    #     # publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}        
+        
+    # - name: start Azure Function App
+    #   run: az functionapp start --name testfnc --resource-group testproject   
+
+  # deploySqlscriptsonUat:
+  #   runs-on: runner2
+  #   needs: build
+  #   # environment: DEV
+
+  #   steps:
+  #   - name: Download Build Artifacts
+  #     uses: actions/download-artifact@v3.0.0
+  #     with:
+  #       name: APPX
+  #       path: .APPX
+        
+  #   - name: Install Azure CLI
+  #     run: |
+  #       curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash         
+        
+  #   - uses: azure/login@v1
+  #     with:
+  #      client-id: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+  #      tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+  #      # subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #      allow-no-subscriptions: true
+  #       # creds: ${{ secrets.AZURE_CREDENTIALS }}
