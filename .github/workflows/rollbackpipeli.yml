@@ -2,15 +2,17 @@ name: Rollback pipeline
 
 on:
   # push:
-  # # pull_request: 
+  # # # pull_request: 
   #   branches:
-  #     # - feature/*
+  # #     # - feature/*
   #     - master
+    tags:
+    - 'v*'
   #     - release/rc-*
   #   paths:
   #     - "**/*"
   #     - .github/workflows/rollback.yaml
-      
+     
   workflow_dispatch:
         inputs:
          mode:
