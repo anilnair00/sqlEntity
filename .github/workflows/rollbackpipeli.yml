@@ -1,210 +1,167 @@
-name: Rollback pipeline
+name: Multi-Stage CI/CD Pipeline
 
 on:
-  # push:
-  # # # pull_request: 
-  #   branches:
-  # #     # - feature/*
-  #     - master
-    tags:
-    - 'v*'
-  #     - release/rc-*
-  #   paths:
-  #     - "**/*"
-  #     - .github/workflows/rollback.yaml
-     
-  workflow_dispatch:
-        inputs:
-         mode:
-            description: "deploy or rollback"
-            required: true
-            type: choice
-            default: deploy
-            options:
-              - deploy
-              - rollback
-         rollback_tag:
-            description: "Git tag to rollback in PROD (example: v1.2.3)"
-            required: false
-            type: string
-    # paths: 
-    #   - "**/*"
-      # - master
+  push:
+    branches:
+      - master
 
-      
-  # schedule:
-  #  # - cron: '10 15 * * *'  # 10:40 AM IST
-  #  # - cron: '30 5 * * *'  # 5:30 AM UTC daily
-  #  - cron: '30 14 * * *'  # 5:30 AM UTC daily
-  # paths:
-  #      - .github/workflows/sqldeploy.yml
-    
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "deploy or rollback"
+        required: true
+        type: choice
+        default: deploy
+        options:
+          - deploy
+          - rollback
+
+      rollback_tag:
+        description: "Rollback release tag (example: v1.0.10)"
+        required: false
+        type: string
+
 env:
-  BUILD_CONFIG: 'Release'
-  # DOTNET_ROOT: '/home/runner/.dotnet'
+  BUILD_CONFIG: Release
 
 permissions:
-  contents: read
-  pages: write
+  contents: write
   id-token: write
-  
+
+#########################################################
+# STAGE 1 - BUILD (ONLY ONCE)
+#########################################################
+
 jobs:
+
   build:
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.mode != 'rollback'
+    if:  github.ref == 'refs/heads/master'
+    # if: github.event_name == 'push'
+
     runs-on: ubuntu-latest
-    
+
+    outputs:
+      artifact_name: functions.zip
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
 
-    - name: Set up .NET Core SDK
-      uses: actions/setup-dotnet@v2
-      with: 
-        dotnet-version: '8.0'
-        
-    - name: Install Entity Framework CLI
-      run: |
-          dotnet tool install --global dotnet-ef
-          export PATH="$PATH:/home/runner/.dotnet/tools"        
-                  
-    - name: Restore NuGet packages
-      run: dotnet restore 
-      
-    # - name: Restore NuGet packages
-    #   run: dotnet restore AirPassengerProtection.Integration.sln
-      
-    - name: Build .NET Projects
-      run: dotnet build ${{ secrets.SOLUTIONFILE }} --configuration $BUILD_CONFIG --no-restore
- 
-    - name: Publish Functions
-      run: |
-          dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} --configuration $BUILD_CONFIG  --no-build --output  ${{ github.workspace }}/temp/functions
-          
-    - name: Zip Functions Artifact
-      run: |
-          mkdir -p ${{ github.workspace }}/APPX/Functions
-          cd ${{ github.workspace }}/temp/functions
-          zip -r ${{ github.workspace }}/APPX/Functions/functions.zip .
-          # zip -r ../myapp.zip .
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Create EF Core migration script ()
-      run: |
-          export PATH="$PATH:/home/runner/.dotnet/tools"
-          dotnet ef migrations script --project ${{ secrets.PUBLISHFUNCTIONS }} --startup-project ${{ secrets.STARTUP }} --context ${{ secrets.CONTEXT }} -i --output ${{github.workspace}}/APPX/migration.sql
-          
-    # - name: Upload Build Artifacts
-    #   uses: actions/upload-artifact@v4.0.0
-    #   with:
-    #     name: APPX
-    #     path: ${{ github.workspace }}/myapp.zip
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
 
-    - name: Upload Combined APPX Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: APPX
-        path: ${{ github.workspace }}/APPX
-    
-    # - name: Upload Build Artifacts
-    #   uses: actions/upload-artifact@v4.0.0
-    #   with:
-    #     name: APPX
-    #     path: ${{ github.workspace }}/sql/migration.sql
+      - name: Restore
+        run: dotnet restore ${{ secrets.SOLUTIONFILE }}
 
-  deploySqlscriptsonDev:
-    # if: github.event_name == 'schedule'
-    # if: success() && github.base_ref == 'master'
-    # if:  github.ref == 'master' || startsWith(github.ref, 'refs/heads/feature/')
-    # if:  github.base_ref == 'master'
-    # if:  github.ref == 'refs/heads/master'
-    if: github.ref == 'refs/heads/master' && (github.event_name != 'workflow_dispatch' || github.event.inputs.mode != 'rollback')
-    # if: github.event_name == 'schedule' || github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+      - name: Build
+        run: dotnet build ${{ secrets.SOLUTIONFILE }} --configuration $BUILD_CONFIG --no-restore
+
+      - name: Publish Function
+        run: |
+          dotnet publish ${{ secrets.PUBLISHFUNCTIONS }} \
+            --configuration $BUILD_CONFIG \
+            --no-build \
+            --output ${{ github.workspace }}/publish
+
+      - name: Create ZIP artifact
+        run: |
+          cd ${{ github.workspace }}/publish
+          zip -r ${{ github.workspace }}/functions.zip .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: functions-artifact
+          path: functions.zip
+
+#########################################################
+# STAGE 2 - CREATE RELEASE (VERSIONING)
+#########################################################
+
+  release:
+
     needs: build
-    # environment: DEV
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Download Build Artifacts
-      uses: actions/download-artifact@v4.0.0
-      with:
-        name: APPX
-        path: .APPX
 
-  rollbackOnPrd:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'rollback'
-    runs-on: k8s-self-hosted-prod
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: functions-artifact
+
+      - name: Generate version tag
+        id: tag
+        run: |
+          TAG="v1.0.${{ github.run_number }}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ steps.tag.outputs.tag }}
+          git push origin ${{ steps.tag.outputs.tag }}
+
+      - name: Create GitHub Release
+        id: release
+        uses: actions/github-script@v9.0.0
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          files: functions.zip
+          generate_release_notes: true
+
+#########################################################
+# STAGE 3 - DEPLOY PROD (FROM SAME ARTIFACT)
+#########################################################
+
+  deployProd:
+
+    needs: build
+    runs-on: ubuntu-latest
+
     environment: PROD
 
     steps:
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: functions-artifact
+
+#########################################################
+# STAGE 4 - ROLLBACK (NO BUILD, ONLY RELEASE ARTIFACT)
+#########################################################
+
+  rollbackProd:
+
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'rollback'
+
+    runs-on: ubuntu-latest
+
+    environment: PROD
+
+    steps:
+
       - name: Validate rollback tag
         run: |
           if [ -z "${{ github.event.inputs.rollback_tag }}" ]; then
-            echo "rollback_tag is required when mode=rollback"
+            echo "rollback_tag required"
             exit 1
           fi
 
-      - name: Checkout selected tag
-        uses: actions/checkout@v4
+      - name: Download release artifact
+        id: download
+        uses: actions/github-script@v9.0.0
         with:
-          ref: ${{ github.event.inputs.rollback_tag }}
-          fetch-depth: 0
+          tag: ${{ github.event.inputs.rollback_tag }}
+          fileName: functions.zip
 
-      - name: Set up .NET Core SDK
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: ${{ secrets.DOTNETVERSION }}
-
-      - name: Restore NuGet packages
-        run: dotnet restore
-
-      - name: Build .NET Projects
-        run: dotnet build ./AirPassengerProtection.Integration.sln --configuration $BUILD_CONFIG --no-restore
-
-      - name: Publish Functions from rollback tag
-        run: |
-          cd AzAiIntegration.Functions
-          dotnet publish AzAiIntegration.Functions.csproj --configuration $BUILD_CONFIG --no-build --output ${{ github.workspace }}/temp/functions
-
-      - name: Zip Functions Artifact
-        run: |
-          mkdir -p ${{ github.workspace }}/APPX/Functions
-          cd ${{ github.workspace }}/temp/functions
-          zip -r ${{ github.workspace }}/APPX/Functions/functions.zip .
-
-      - name: Install Azure CLI
-        run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
-      - name: Login to Azure Subscription
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.PRD_AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          allow-no-subscriptions: true
-
-      - name: Disable blob and service bus triggers
-        run: |
-          az functionapp config appsettings set \
-            --name ${{ secrets.PRD_FUNCAPP_NAME }} \
-            --resource-group ${{ secrets.PRD_RG_NAME }} \
-            --settings AzureWebJobs.AiReceiptReaderRequestHandler.Disabled=true AzureWebJobs.AiReceiptReaderResponseHandler.Disabled=true
-
-      - name: Wait for 20 seconds
-        run: sleep 20
-
-      - name: Stop Azure Function App
-        run: az functionapp stop --name ${{ secrets.PRD_FUNCAPP_NAME }} --resource-group ${{ secrets.PRD_RG_NAME }}
-
-      - name: Deploy rollback package
-        uses: Azure/functions-action@v1.5.3
+      - name: Deploy rollback version
+        uses: Azure/functions-action@v1
         with:
           app-name: ${{ secrets.PRD_FUNCAPP_NAME }}
-          package: ${{ github.workspace }}/APPX/Functions/functions.zip
-
-      - name: Start Azure Function App
-        run: az functionapp start --name ${{ secrets.PRD_FUNCAPP_NAME }} --resource-group ${{ secrets.PRD_RG_NAME }}
-
-      - name: Re-enable blob and service bus triggers
-        run: |
-          az functionapp config appsettings set \
-            --name ${{ secrets.PRD_FUNCAPP_NAME }} \
-            --resource-group ${{ secrets.PRD_RG_NAME }} \
-            --settings AzureWebJobs.AiReceiptReaderRequestHandler.Disabled=false AzureWebJobs.AiReceiptReaderResponseHandler.Disabled=false
+          package: functions.zip
