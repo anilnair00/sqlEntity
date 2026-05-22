@@ -153,7 +153,12 @@ jobs:
     environment: PROD
 
     steps:
-
+    
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
       - name: Validate rollback tag
         run: |
           if [ -z "${{ github.event.inputs.rollback_tag }}" ]; then
@@ -168,8 +173,8 @@ jobs:
             --pattern "functions.zip" \
             --clobber
 
-      - name: Deploy rollback version
-        uses: Azure/functions-action@v1
-        with:
-          app-name: ${{ secrets.PRD_FUNCAPP_NAME }}
-          package: functions.zip
+      # - name: Deploy rollback version
+      #   uses: Azure/functions-action@v1
+      #   with:
+      #     app-name: ${{ secrets.PRD_FUNCAPP_NAME }}
+      #     package: functions.zip
