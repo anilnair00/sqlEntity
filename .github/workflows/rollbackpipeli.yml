@@ -87,39 +87,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: functions-artifact
         
-
       - name: Generate version tag
         id: tag
         run: |
           TAG="v1.0.${{ github.run_number }}"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
           
       - name: Create Git tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag ${{ steps.tag.outputs.tag }}
-          git push origin ${{ steps.tag.outputs.tag }}
-
+          if git rev-parse "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag already exists"
+          else
+            git tag "${{ steps.tag.outputs.tag }}"
+            git push origin "${{ steps.tag.outputs.tag }}"
+          fi
+          
       - name: Create GitHub Release
-        id: release
-        uses: actions/github-script@v9.0.0
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          files: functions.zip
-          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.tag.outputs.tag }}" \
+            functions.zip \
+            --generate-notes
 
 #########################################################
 # STAGE 3 - DEPLOY PROD (FROM SAME ARTIFACT)
@@ -159,13 +160,13 @@ jobs:
             echo "rollback_tag required"
             exit 1
           fi
-
       - name: Download release artifact
-        id: download
-        uses: actions/github-script@v9.0.0
-        with:
-          tag: ${{ github.event.inputs.rollback_tag }}
-          fileName: functions.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download "${{ github.event.inputs.rollback_tag }}" \
+            --pattern "functions.zip" \
+            --clobber
 
       - name: Deploy rollback version
         uses: Azure/functions-action@v1
