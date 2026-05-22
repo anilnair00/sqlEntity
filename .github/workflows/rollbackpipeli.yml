@@ -92,6 +92,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: functions-artifact
+        
 
       - name: Generate version tag
         id: tag
@@ -99,10 +100,16 @@ jobs:
           TAG="v1.0.${{ github.run_number }}"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+          
       - name: Create Git tag
         run: |
-          # git config user.name "github-actions"
-          # git config user.email "github-actions@github.com"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git tag ${{ steps.tag.outputs.tag }}
           git push origin ${{ steps.tag.outputs.tag }}
 
