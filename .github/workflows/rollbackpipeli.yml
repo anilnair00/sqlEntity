@@ -35,7 +35,7 @@ permissions:
 jobs:
 
   build:
-    if:  github.ref == 'refs/heads/master'
+    if:  github.ref == 'refs/heads/master' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'deploy')
     # if: github.event_name == 'push'
 
     runs-on: ubuntu-latest
@@ -85,6 +85,7 @@ jobs:
 
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'deploy')
 
     steps:
       - name: Checkout repository
